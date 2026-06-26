@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kumravi253.nearmatch"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,6 +25,21 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "NearMatch needs access to your photos so you can set a profile picture.",
+          "cameraPermission": "NearMatch needs access to your camera so you can take a profile picture."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e20a4ab0-26c2-47ad-8254-9640e1f80fe8"
+      }
+    },
+    "owner": "kumravi253-source"
   }
 }
