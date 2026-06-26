@@ -4,11 +4,13 @@ import {
   StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { AGE_ATTESTATION_TEXT } from '../../lib/legal';
 
 export default function AuthScreen({ initialMode = 'login', onBack, onSuccess }) {
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [attested, setAttested] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -19,6 +21,10 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
     }
     if (password.length < 6) {
       Alert.alert('Error', 'Password must be at least 6 characters');
+      return;
+    }
+    if (mode === 'signup' && !attested) {
+      Alert.alert('Error', 'Please confirm you are 18 or older to continue');
       return;
     }
 
@@ -92,6 +98,19 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
           secureTextEntry
         />
 
+        {mode === 'signup' && (
+          <TouchableOpacity
+            style={styles.attestRow}
+            onPress={() => setAttested((a) => !a)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.checkbox, attested && styles.checkboxChecked]}>
+              {attested && <Text style={styles.checkboxMark}>✓</Text>}
+            </View>
+            <Text style={styles.attestText}>{AGE_ATTESTATION_TEXT}</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity style={styles.btn} onPress={handleSubmit} disabled={loading}>
           {loading ? (
             <ActivityIndicator color="#fff" />
@@ -127,6 +146,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF0EA', borderWidth: 1.5, borderColor: '#F5C4B0',
     borderRadius: 12, padding: 14, fontSize: 14, color: '#3D1A0E', marginBottom: 12,
   },
+  attestRow: {
+    flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16, paddingRight: 8,
+  },
+  checkbox: {
+    width: 20, height: 20, borderRadius: 5, borderWidth: 1.5, borderColor: '#F5C4B0',
+    backgroundColor: '#FEF0EA', alignItems: 'center', justifyContent: 'center',
+    marginRight: 10, marginTop: 1,
+  },
+  checkboxChecked: { backgroundColor: '#E8603A', borderColor: '#E8603A' },
+  checkboxMark: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  attestText: { flex: 1, fontSize: 12, color: '#8C4A35', lineHeight: 17 },
   btn: {
     backgroundColor: '#E8603A', borderRadius: 12, padding: 15,
     alignItems: 'center', marginBottom: 16, marginTop: 4, minHeight: 50, justifyContent: 'center',

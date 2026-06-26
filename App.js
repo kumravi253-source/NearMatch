@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { supabase } from './src/lib/supabase';
+import { AGE_ATTESTATION_TEXT } from './src/lib/legal';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
 import SwipeScreen from './src/screens/swipe/SwipeScreen';
@@ -56,6 +57,23 @@ export default function App() {
     return () => {
       cancelled = true;
     };
+  }, [session]);
+
+  useEffect(() => {
+    if (!session) return;
+    // Records the 18+ attestation the user agreed to at signup. The
+    // signup form requires the checkbox before it submits, so by the
+    // time any session exists, the attestation already happened —
+    // this just durably logs it the first time we can (unique on
+    // user_id, so repeat logins are harmless no-ops).
+    supabase
+      .from('legal_attestations')
+      .insert({ user_id: session.user.id, attestation_text: AGE_ATTESTATION_TEXT })
+      .then(({ error }) => {
+        if (error && error.code !== '23505') {
+          console.error('Failed to record age attestation', error);
+        }
+      });
   }, [session]);
 
   const handleProfileComplete = (savedProfile) => {
