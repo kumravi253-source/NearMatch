@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
 
-export default function SwipeScreen({ userId, onSignOut }) {
+export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge }) {
   const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -180,9 +180,18 @@ export default function SwipeScreen({ userId, onSignOut }) {
       <View style={styles.headerRow}>
         <View style={styles.headerSpacer} />
         <Text style={styles.header}>Discover 🌸</Text>
-        <TouchableOpacity style={styles.headerSpacer} onPress={onSignOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+        <View style={styles.headerSpacer}>
+          <TouchableOpacity onPress={onSignOut}>
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
+          {isAgeVerified ? (
+            <Text style={styles.verifiedText}>✓ Verified</Text>
+          ) : (
+            <TouchableOpacity onPress={onVerifyAge}>
+              <Text style={styles.verifyLinkText}>Get Verified</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View style={styles.cardArea}>
@@ -255,7 +264,10 @@ function ProfileCard({ profile }) {
         )}
       </View>
       <View style={styles.cardInfo}>
-        <Text style={styles.name}>{profile.name}, {profile.age}</Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.name}>{profile.name}, {profile.age}</Text>
+          {profile.age_verified && <Text style={styles.badge}>✓ Verified</Text>}
+        </View>
         <Text style={styles.bio}>{profile.bio}</Text>
         <View style={styles.interestsWrap}>
           {(profile.interests || []).map((i) => (
@@ -273,8 +285,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF5F0', paddingTop: 60 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
   header: { fontSize: 22, fontWeight: '700', color: '#E8603A', textAlign: 'center' },
-  headerSpacer: { width: 70 },
+  headerSpacer: { width: 80, alignItems: 'flex-end' },
   signOutText: { fontSize: 12, color: '#B87A68', textAlign: 'right' },
+  verifiedText: { fontSize: 11, color: '#3DBE6B', fontWeight: '700', marginTop: 4 },
+  verifyLinkText: { fontSize: 11, color: '#E8603A', fontWeight: '700', marginTop: 4 },
   cardArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   card: {
     position: 'absolute', width: SCREEN_WIDTH - 40, height: '90%',
@@ -286,7 +300,12 @@ const styles = StyleSheet.create({
   photoEmoji: { fontSize: 96 },
   photoImage: { width: '100%', height: '100%' },
   cardInfo: { padding: 18 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   name: { fontSize: 22, fontWeight: '700', color: '#3D1A0E' },
+  badge: {
+    fontSize: 11, fontWeight: '700', color: '#3DBE6B', backgroundColor: '#E7F7EC',
+    borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
+  },
   bio: { fontSize: 14, color: '#8C4A35', marginTop: 6, marginBottom: 10 },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { backgroundColor: '#FEF0EA', borderRadius: 16, paddingVertical: 5, paddingHorizontal: 10, borderWidth: 1, borderColor: '#F5C4B0' },

@@ -141,7 +141,10 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
                 )}
               </View>
               <View style={styles.rowText}>
-                <Text style={styles.name}>{item.name}</Text>
+                <View style={styles.nameRow}>
+                  <Text style={styles.name}>{item.name}</Text>
+                  {item.age_verified && <Text style={styles.badge}>✓</Text>}
+                </View>
                 <Text style={styles.preview} numberOfLines={1}>
                   {item.lastMessage || 'Say hello! 👋'}
                 </Text>
@@ -321,7 +324,12 @@ const styles = StyleSheet.create({
   avatarImage: { width: 52, height: 52 },
   avatarEmoji: { fontSize: 26 },
   rowText: { flex: 1 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   name: { fontSize: 15, fontWeight: '700', color: '#3D1A0E' },
+  badge: {
+    fontSize: 10, fontWeight: '700', color: '#3DBE6B', backgroundColor: '#E7F7EC',
+    borderRadius: 8, paddingHorizontal: 5, paddingVertical: 2,
+  },
   preview: { fontSize: 13, color: '#B87A68', marginTop: 2 },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emptyEmoji: { fontSize: 64, marginBottom: 16 },

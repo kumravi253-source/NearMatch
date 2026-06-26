@@ -8,6 +8,7 @@ import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
 import SwipeScreen from './src/screens/swipe/SwipeScreen';
 import MatchesScreen from './src/screens/matches/MatchesScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
+import VerifyAgeScreen from './src/screens/verify/VerifyAgeScreen';
 
 const TABS = [
   { key: 'swipe', label: 'Discover', icon: '🔥' },
@@ -22,6 +23,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState('login');
   const [tab, setTab] = useState('swipe');
   const [selectedChatId, setSelectedChatId] = useState(null);
+  const [showVerifyAge, setShowVerifyAge] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session ?? null));
@@ -89,6 +91,12 @@ export default function App() {
     await supabase.auth.signOut();
   };
 
+  const handleVerifyAgeDone = async () => {
+    setShowVerifyAge(false);
+    const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+    if (data) setProfile(data);
+  };
+
   if (session === undefined || (session && profile === undefined)) {
     return (
       <View style={styles.splash}>
@@ -122,12 +130,21 @@ export default function App() {
     return <ProfileSetupScreen userId={session.user.id} onComplete={handleProfileComplete} />;
   }
 
+  if (showVerifyAge) {
+    return <VerifyAgeScreen onDone={handleVerifyAgeDone} />;
+  }
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
       <View style={styles.tabContent}>
         <View style={tab === 'swipe' ? styles.tabPane : styles.tabPaneHidden}>
-          <SwipeScreen userId={session.user.id} onSignOut={handleSignOut} />
+          <SwipeScreen
+            userId={session.user.id}
+            onSignOut={handleSignOut}
+            isAgeVerified={profile.age_verified}
+            onVerifyAge={() => setShowVerifyAge(true)}
+          />
         </View>
         <View style={tab === 'matches' ? styles.tabPane : styles.tabPaneHidden}>
           <MatchesScreen userId={session.user.id} active={tab === 'matches'} onOpenChat={handleOpenChat} />

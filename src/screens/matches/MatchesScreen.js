@@ -99,7 +99,10 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
                   <Text style={styles.avatarEmoji}>{item.avatar_emoji || '🙂'}</Text>
                 )}
               </View>
-              <Text style={styles.name}>{item.name}, {item.age}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{item.name}, {item.age}</Text>
+                {item.age_verified && <Text style={styles.badge}>✓</Text>}
+              </View>
               <Text style={styles.subtext}>It's a match!</Text>
             </TouchableOpacity>
           )}
@@ -124,7 +127,12 @@ const styles = StyleSheet.create({
   },
   avatarImage: { width: 72, height: 72 },
   avatarEmoji: { fontSize: 36 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   name: { fontSize: 15, fontWeight: '700', color: '#3D1A0E' },
+  badge: {
+    fontSize: 10, fontWeight: '700', color: '#3DBE6B', backgroundColor: '#E7F7EC',
+    borderRadius: 8, paddingHorizontal: 5, paddingVertical: 2,
+  },
   subtext: { fontSize: 12, color: '#E8603A', marginTop: 2 },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
