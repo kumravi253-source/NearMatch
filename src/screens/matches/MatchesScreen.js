@@ -26,21 +26,28 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
       return;
     }
 
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('*')
-      .in('id', otherUserIds);
+    const [{ data: profiles, error: profilesError }, { data: blocks, error: blocksError }] = await Promise.all([
+      supabase.from('profiles').select('*').in('id', otherUserIds),
+      supabase.from('blocks').select('blocker_id, blocked_id').or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`),
+    ]);
 
     if (profilesError) {
       console.error('Failed to load match profiles', profilesError);
       setMatches([]);
       return;
     }
+    if (blocksError) console.error('Failed to load blocks', blocksError);
+
+    const blockedWith = new Set();
+    (blocks || []).forEach((b) => {
+      blockedWith.add(b.blocker_id === userId ? b.blocked_id : b.blocker_id);
+    });
 
     const profileById = new Map((profiles || []).map((p) => [p.id, p]));
     const merged = matchRows
       .map((m) => {
         const otherId = m.user_a === userId ? m.user_b : m.user_a;
+        if (blockedWith.has(otherId)) return null;
         const profile = profileById.get(otherId);
         return profile ? { matchId: m.id, ...profile } : null;
       })

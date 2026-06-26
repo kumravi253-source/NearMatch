@@ -20,20 +20,9 @@ export default function SwipeScreen({ userId, onSignOut }) {
     const loadCandidates = async () => {
       setLoading(true);
 
-      const { data: swiped, error: swipedError } = await supabase
-        .from('swipes')
-        .select('swiped_id')
-        .eq('swiper_id', userId);
-
-      if (swipedError) {
-        console.error('Failed to load swipe history', swipedError);
-      }
-
-      const excludeIds = [userId, ...(swiped || []).map((s) => s.swiped_id)];
-
-      let query = supabase.from('profiles').select('*').not('id', 'in', `(${excludeIds.join(',')})`);
-
-      const { data: candidates, error: candidatesError } = await query;
+      const { data: candidates, error: candidatesError } = await supabase.rpc('get_candidate_profiles', {
+        p_limit: 30,
+      });
 
       if (cancelled) return;
 
@@ -78,12 +67,74 @@ export default function SwipeScreen({ userId, onSignOut }) {
 
       if (error) {
         console.error('Failed to record swipe', error);
+        if (error.message?.includes('rate_limit_exceeded')) {
+          Alert.alert("You're swiping fast!", 'Take a short break and try again in a minute.');
+        }
         return;
       }
       if (data?.matched) {
         Alert.alert("It's a match! 🎉", `You and ${profile.name} liked each other.`);
       }
     });
+  };
+
+  const handleSafetyMenu = (targetProfile) => {
+    Alert.alert(
+      targetProfile.name,
+      'What would you like to do?',
+      [
+        { text: 'Report', onPress: () => handleReport(targetProfile), style: 'destructive' },
+        { text: 'Block', onPress: () => handleBlock(targetProfile), style: 'destructive' },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handleBlock = async (targetProfile) => {
+    const { error } = await supabase
+      .from('blocks')
+      .insert({ blocker_id: userId, blocked_id: targetProfile.id });
+    if (error && error.code !== '23505') {
+      console.error('Failed to block user', error);
+      Alert.alert('Error', 'Could not block this user. Please try again.');
+      return;
+    }
+    setProfiles((prev) => prev.filter((p) => p.id !== targetProfile.id));
+    Alert.alert('Blocked', `You won't see ${targetProfile.name} again.`);
+  };
+
+  const REPORT_REASONS = [
+    { label: 'Inappropriate photos', value: 'inappropriate_photos' },
+    { label: 'Harassment', value: 'harassment' },
+    { label: 'Fake profile', value: 'fake_profile' },
+    { label: 'Spam', value: 'spam' },
+    { label: 'Other', value: 'other' },
+  ];
+
+  const handleReport = (targetProfile) => {
+    Alert.alert(
+      `Report ${targetProfile.name}`,
+      'Why are you reporting this profile?',
+      [
+        ...REPORT_REASONS.map((r) => ({
+          text: r.label,
+          onPress: () => submitReport(targetProfile, r.value),
+        })),
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const submitReport = async (targetProfile, reason) => {
+    const { error } = await supabase
+      .from('reports')
+      .insert({ reporter_id: userId, reported_id: targetProfile.id, reason });
+    if (error) {
+      console.error('Failed to submit report', error);
+      Alert.alert('Error', 'Could not submit your report. Please try again.');
+      return;
+    }
+    Alert.alert('Report submitted', "Thanks for letting us know — we'll review this profile.");
   };
 
   const panResponder = useRef(
@@ -171,6 +222,9 @@ export default function SwipeScreen({ userId, onSignOut }) {
             <Animated.View style={[styles.badge, styles.nopeBadge, { opacity: nopeOpacity }]}>
               <Text style={styles.badgeText}>NOPE</Text>
             </Animated.View>
+            <TouchableOpacity style={styles.safetyBtn} onPress={() => handleSafetyMenu(profile)}>
+              <Text style={styles.safetyBtnText}>⋯</Text>
+            </TouchableOpacity>
             <ProfileCard profile={profile} />
           </Animated.View>
         )}
@@ -243,6 +297,12 @@ const styles = StyleSheet.create({
   },
   likeBadge: { left: 20, borderColor: '#3DBE6B', transform: [{ rotate: '-20deg' }] },
   nopeBadge: { right: 20, borderColor: '#E8603A', transform: [{ rotate: '20deg' }] },
+  safetyBtn: {
+    position: 'absolute', top: 16, right: 16, zIndex: 20,
+    width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  safetyBtnText: { color: '#fff', fontSize: 18, fontWeight: '700', marginTop: -8 },
   badgeText: { fontSize: 28, fontWeight: '800', color: '#3D1A0E' },
   emptyState: { alignItems: 'center', padding: 32 },
   emptyEmoji: { fontSize: 64, marginBottom: 16 },

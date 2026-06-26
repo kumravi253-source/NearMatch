@@ -1,9 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator,
+  TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+
+const REPORT_REASONS = [
+  { label: 'Inappropriate photos', value: 'inappropriate_photos' },
+  { label: 'Harassment', value: 'harassment' },
+  { label: 'Fake profile', value: 'fake_profile' },
+  { label: 'Spam', value: 'spam' },
+  { label: 'Other', value: 'other' },
+];
 
 export default function ChatScreen({ userId, active, selectedChatId, onSelectChat }) {
   const [matches, setMatches] = useState([]);
@@ -30,18 +38,28 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
     }
 
     const matchIds = matchRows.map((m) => m.id);
-    const [{ data: profiles, error: profilesError }, { data: lastMessages, error: messagesError }] =
-      await Promise.all([
-        supabase.from('profiles').select('*').in('id', otherUserIds),
-        supabase
-          .from('messages')
-          .select('match_id, body, created_at')
-          .in('match_id', matchIds)
-          .order('created_at', { ascending: false }),
-      ]);
+    const [
+      { data: profiles, error: profilesError },
+      { data: lastMessages, error: messagesError },
+      { data: blocks, error: blocksError },
+    ] = await Promise.all([
+      supabase.from('profiles').select('*').in('id', otherUserIds),
+      supabase
+        .from('messages')
+        .select('match_id, body, created_at')
+        .in('match_id', matchIds)
+        .order('created_at', { ascending: false }),
+      supabase.from('blocks').select('blocker_id, blocked_id').or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`),
+    ]);
 
     if (profilesError) console.error('Failed to load match profiles', profilesError);
     if (messagesError) console.error('Failed to load last messages', messagesError);
+    if (blocksError) console.error('Failed to load blocks', blocksError);
+
+    const blockedWith = new Set();
+    (blocks || []).forEach((b) => {
+      blockedWith.add(b.blocker_id === userId ? b.blocked_id : b.blocker_id);
+    });
 
     const profileById = new Map((profiles || []).map((p) => [p.id, p]));
     const lastMessageByMatch = new Map();
@@ -52,6 +70,7 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
     const merged = matchRows
       .map((m) => {
         const otherId = m.user_a === userId ? m.user_b : m.user_a;
+        if (blockedWith.has(otherId)) return null;
         const profile = profileById.get(otherId);
         if (!profile) return null;
         return { matchId: m.id, lastMessage: lastMessageByMatch.get(m.id) || null, ...profile };
@@ -81,6 +100,10 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
         userId={userId}
         match={selectedMatch}
         onBack={() => {
+          onSelectChat(null);
+          loadMatches();
+        }}
+        onBlocked={() => {
           onSelectChat(null);
           loadMatches();
         }}
@@ -131,7 +154,7 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
   );
 }
 
-function ConversationView({ userId, match, onBack }) {
+function ConversationView({ userId, match, onBack, onBlocked }) {
   const [text, setText] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -178,7 +201,61 @@ function ConversationView({ userId, match, onBack }) {
       .insert({ match_id: match.matchId, sender_id: userId, body });
     if (error) {
       console.error('Failed to send message', error);
+      if (error.message?.includes('rate_limit_exceeded')) {
+        Alert.alert("You're sending messages fast!", 'Take a short break and try again in a minute.');
+      }
     }
+  };
+
+  const handleSafetyMenu = () => {
+    Alert.alert(
+      match.name,
+      'What would you like to do?',
+      [
+        { text: 'Report', onPress: handleReport, style: 'destructive' },
+        { text: 'Block', onPress: handleBlock, style: 'destructive' },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handleBlock = async () => {
+    const { error } = await supabase
+      .from('blocks')
+      .insert({ blocker_id: userId, blocked_id: match.id });
+    if (error && error.code !== '23505') {
+      console.error('Failed to block user', error);
+      Alert.alert('Error', 'Could not block this user. Please try again.');
+      return;
+    }
+    Alert.alert('Blocked', `You won't see ${match.name} again.`);
+    onBlocked();
+  };
+
+  const handleReport = () => {
+    Alert.alert(
+      `Report ${match.name}`,
+      'Why are you reporting this profile?',
+      [
+        ...REPORT_REASONS.map((r) => ({
+          text: r.label,
+          onPress: () => submitReport(r.value),
+        })),
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const submitReport = async (reason) => {
+    const { error } = await supabase
+      .from('reports')
+      .insert({ reporter_id: userId, reported_id: match.id, reason });
+    if (error) {
+      console.error('Failed to submit report', error);
+      Alert.alert('Error', 'Could not submit your report. Please try again.');
+      return;
+    }
+    Alert.alert('Report submitted', "Thanks for letting us know — we'll review this profile.");
   };
 
   return (
@@ -188,7 +265,9 @@ function ConversationView({ userId, match, onBack }) {
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.convoName}>{match.name}</Text>
-        <View style={{ width: 50 }} />
+        <TouchableOpacity onPress={handleSafetyMenu} style={styles.convoMenuBtn}>
+          <Text style={styles.convoMenuText}>⋯</Text>
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -254,6 +333,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F5C4B0',
   },
   backBtn: { width: 50 },
+  convoMenuBtn: { width: 50, alignItems: 'flex-end' },
+  convoMenuText: { fontSize: 22, color: '#B87A68', fontWeight: '700' },
   backText: { fontSize: 15, color: '#E8603A', fontWeight: '600' },
   convoName: { fontSize: 17, fontWeight: '700', color: '#3D1A0E' },
   messageList: { padding: 16, flexGrow: 1, justifyContent: 'flex-end' },
