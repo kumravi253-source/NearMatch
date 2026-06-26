@@ -1,38 +1,88 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, Animated, PanResponder,
-  Dimensions, TouchableOpacity, Image,
+  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert,
 } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
 
-const PROFILES = [
-  { id: '1', photo: 'https://i.pravatar.cc/600?img=47', avatar: '🌻', name: 'Mia', age: 26, bio: 'Sunflower enthusiast & weekend hiker.', interests: ['Hiking', 'Coffee', 'Art'], distance: '2 miles away' },
-  { id: '2', photo: 'https://i.pravatar.cc/600?img=12', avatar: '😎', name: 'Jordan', age: 29, bio: 'Foodie chasing the best tacos in town.', interests: ['Foodie', 'Travel'], distance: '5 miles away' },
-  { id: '3', photo: 'https://i.pravatar.cc/600?img=44', avatar: '🦋', name: 'Ava', age: 24, bio: 'Bookworm with a soft spot for live music.', interests: ['Reading', 'Music'], distance: '1 mile away' },
-  { id: '4', photo: 'https://i.pravatar.cc/600?img=14', avatar: '🥳', name: 'Leo', age: 31, bio: 'Gym in the morning, gaming at night.', interests: ['Fitness', 'Gaming'], distance: '8 miles away' },
-  { id: '5', photo: 'https://i.pravatar.cc/600?img=45', avatar: '🌸', name: 'Sofia', age: 27, bio: 'Dog mom, dance lover, dessert addict.', interests: ['Pets', 'Dancing'], distance: '3 miles away' },
-];
-
-export default function SwipeScreen({ onMatch }) {
+export default function SwipeScreen({ userId, onSignOut }) {
+  const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const position = useRef(new Animated.ValueXY()).current;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCandidates = async () => {
+      setLoading(true);
+
+      const { data: swiped, error: swipedError } = await supabase
+        .from('swipes')
+        .select('swiped_id')
+        .eq('swiper_id', userId);
+
+      if (swipedError) {
+        console.error('Failed to load swipe history', swipedError);
+      }
+
+      const excludeIds = [userId, ...(swiped || []).map((s) => s.swiped_id)];
+
+      let query = supabase.from('profiles').select('*').not('id', 'in', `(${excludeIds.join(',')})`);
+
+      const { data: candidates, error: candidatesError } = await query;
+
+      if (cancelled) return;
+
+      if (candidatesError) {
+        console.error('Failed to load candidates', candidatesError);
+        setProfiles([]);
+      } else {
+        setProfiles(candidates || []);
+      }
+      setIndex(0);
+      setLoading(false);
+    };
+
+    loadCandidates();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const resetPosition = () => {
     Animated.spring(position, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
   };
 
   const swipeOff = (direction) => {
-    const profile = PROFILES[index];
+    const profile = profiles[index];
+    if (!profile) return;
+
     Animated.timing(position, {
       toValue: { x: direction * SCREEN_WIDTH * 1.5, y: 0 },
       duration: 250,
       useNativeDriver: false,
-    }).start(() => {
-      if (direction > 0 && profile) onMatch(profile);
+    }).start(async () => {
       position.setValue({ x: 0, y: 0 });
       setIndex((i) => i + 1);
+
+      const { data, error } = await supabase
+        .rpc('record_swipe', {
+          p_swiped_id: profile.id,
+          p_direction: direction > 0 ? 'like' : 'pass',
+        })
+        .single();
+
+      if (error) {
+        console.error('Failed to record swipe', error);
+        return;
+      }
+      if (data?.matched) {
+        Alert.alert("It's a match! 🎉", `You and ${profile.name} liked each other.`);
+      }
     });
   };
 
@@ -71,15 +121,23 @@ export default function SwipeScreen({ onMatch }) {
     extrapolate: 'clamp',
   });
 
-  const profile = PROFILES[index];
-  const nextProfile = PROFILES[index + 1];
+  const profile = profiles[index];
+  const nextProfile = profiles[index + 1];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Discover 🌸</Text>
+      <View style={styles.headerRow}>
+        <View style={styles.headerSpacer} />
+        <Text style={styles.header}>Discover 🌸</Text>
+        <TouchableOpacity style={styles.headerSpacer} onPress={onSignOut}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.cardArea}>
-        {!profile && (
+        {loading && <ActivityIndicator size="large" color="#E8603A" />}
+
+        {!loading && !profile && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🌅</Text>
             <Text style={styles.emptyText}>You've seen everyone nearby!</Text>
@@ -87,13 +145,13 @@ export default function SwipeScreen({ onMatch }) {
           </View>
         )}
 
-        {nextProfile && (
+        {!loading && nextProfile && (
           <View style={[styles.card, styles.cardBehind]}>
             <ProfileCard profile={nextProfile} />
           </View>
         )}
 
-        {profile && (
+        {!loading && profile && (
           <Animated.View
             {...panResponder.panHandlers}
             style={[
@@ -118,7 +176,7 @@ export default function SwipeScreen({ onMatch }) {
         )}
       </View>
 
-      {profile && (
+      {!loading && profile && (
         <View style={styles.actions}>
           <TouchableOpacity style={styles.actionBtnNope} onPress={() => swipeOff(-1)}>
             <Text style={styles.actionIconNope}>✕</Text>
@@ -136,18 +194,17 @@ function ProfileCard({ profile }) {
   return (
     <>
       <View style={styles.photoPlaceholder}>
-        {profile.photo ? (
-          <Image source={{ uri: profile.photo }} style={styles.photoImage} />
+        {profile.photo_url ? (
+          <Image source={{ uri: profile.photo_url }} style={styles.photoImage} />
         ) : (
-          <Text style={styles.photoEmoji}>{profile.avatar}</Text>
+          <Text style={styles.photoEmoji}>{profile.avatar_emoji || '🙂'}</Text>
         )}
       </View>
       <View style={styles.cardInfo}>
         <Text style={styles.name}>{profile.name}, {profile.age}</Text>
-        <Text style={styles.distance}>{profile.distance}</Text>
         <Text style={styles.bio}>{profile.bio}</Text>
         <View style={styles.interestsWrap}>
-          {profile.interests.map((i) => (
+          {(profile.interests || []).map((i) => (
             <View key={i} style={styles.chip}>
               <Text style={styles.chipText}>{i}</Text>
             </View>
@@ -160,7 +217,10 @@ function ProfileCard({ profile }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF5F0', paddingTop: 60 },
-  header: { fontSize: 22, fontWeight: '700', color: '#E8603A', textAlign: 'center', marginBottom: 16 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
+  header: { fontSize: 22, fontWeight: '700', color: '#E8603A', textAlign: 'center' },
+  headerSpacer: { width: 70 },
+  signOutText: { fontSize: 12, color: '#B87A68', textAlign: 'right' },
   cardArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   card: {
     position: 'absolute', width: SCREEN_WIDTH - 40, height: '90%',
@@ -173,8 +233,7 @@ const styles = StyleSheet.create({
   photoImage: { width: '100%', height: '100%' },
   cardInfo: { padding: 18 },
   name: { fontSize: 22, fontWeight: '700', color: '#3D1A0E' },
-  distance: { fontSize: 13, color: '#B87A68', marginBottom: 8 },
-  bio: { fontSize: 14, color: '#8C4A35', marginBottom: 10 },
+  bio: { fontSize: 14, color: '#8C4A35', marginTop: 6, marginBottom: 10 },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { backgroundColor: '#FEF0EA', borderRadius: 16, paddingVertical: 5, paddingHorizontal: 10, borderWidth: 1, borderColor: '#F5C4B0' },
   chipText: { fontSize: 12, color: '#8C4A35' },

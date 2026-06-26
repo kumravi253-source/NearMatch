@@ -1,19 +1,89 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  TextInput, KeyboardAvoidingView, Platform, Image,
+  TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator,
 } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
-export default function ChatScreen({ matches, conversations, onSendMessage, selectedChatId, onSelectChat }) {
-  const selectedMatch = matches.find((m) => m.id === selectedChatId);
+export default function ChatScreen({ userId, active, selectedChatId, onSelectChat }) {
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  if (selectedMatch) {
+  const loadMatches = useCallback(async () => {
+    const { data: matchRows, error: matchError } = await supabase
+      .from('matches')
+      .select('id, user_a, user_b, created_at')
+      .or(`user_a.eq.${userId},user_b.eq.${userId}`)
+      .order('created_at', { ascending: false });
+
+    if (matchError) {
+      console.error('Failed to load matches', matchError);
+      setMatches([]);
+      return;
+    }
+
+    const otherUserIds = (matchRows || []).map((m) => (m.user_a === userId ? m.user_b : m.user_a));
+    if (otherUserIds.length === 0) {
+      setMatches([]);
+      return;
+    }
+
+    const matchIds = matchRows.map((m) => m.id);
+    const [{ data: profiles, error: profilesError }, { data: lastMessages, error: messagesError }] =
+      await Promise.all([
+        supabase.from('profiles').select('*').in('id', otherUserIds),
+        supabase
+          .from('messages')
+          .select('match_id, body, created_at')
+          .in('match_id', matchIds)
+          .order('created_at', { ascending: false }),
+      ]);
+
+    if (profilesError) console.error('Failed to load match profiles', profilesError);
+    if (messagesError) console.error('Failed to load last messages', messagesError);
+
+    const profileById = new Map((profiles || []).map((p) => [p.id, p]));
+    const lastMessageByMatch = new Map();
+    (lastMessages || []).forEach((m) => {
+      if (!lastMessageByMatch.has(m.match_id)) lastMessageByMatch.set(m.match_id, m.body);
+    });
+
+    const merged = matchRows
+      .map((m) => {
+        const otherId = m.user_a === userId ? m.user_b : m.user_a;
+        const profile = profileById.get(otherId);
+        if (!profile) return null;
+        return { matchId: m.id, lastMessage: lastMessageByMatch.get(m.id) || null, ...profile };
+      })
+      .filter(Boolean);
+
+    setMatches(merged);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!active) return;
+    setLoading(true);
+    loadMatches().finally(() => setLoading(false));
+  }, [active, loadMatches]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadMatches();
+    setRefreshing(false);
+  };
+
+  const selectedMatch = matches.find((m) => m.matchId === selectedChatId);
+
+  if (selectedChatId && selectedMatch) {
     return (
       <ConversationView
+        userId={userId}
         match={selectedMatch}
-        messages={conversations[selectedMatch.id] || []}
-        onSend={(text) => onSendMessage(selectedMatch.id, text)}
-        onBack={() => onSelectChat(null)}
+        onBack={() => {
+          onSelectChat(null);
+          loadMatches();
+        }}
       />
     );
   }
@@ -22,51 +92,93 @@ export default function ChatScreen({ matches, conversations, onSendMessage, sele
     <View style={styles.container}>
       <Text style={styles.header}>Messages 💬</Text>
 
-      {matches.length === 0 ? (
-        <View style={styles.emptyState}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#E8603A" style={{ marginTop: 40 }} />
+      ) : matches.length === 0 ? (
+        <TouchableOpacity style={styles.emptyState} onPress={handleRefresh} disabled={refreshing}>
           <Text style={styles.emptyEmoji}>🌸</Text>
           <Text style={styles.emptyText}>No conversations yet</Text>
           <Text style={styles.emptySubtext}>Match with someone to start chatting!</Text>
-        </View>
+          <Text style={styles.refreshHint}>{refreshing ? 'Refreshing…' : 'Tap to refresh'}</Text>
+        </TouchableOpacity>
       ) : (
         <FlatList
           data={matches}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.matchId)}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => {
-            const thread = conversations[item.id] || [];
-            const lastMessage = thread[thread.length - 1];
-            return (
-              <TouchableOpacity style={styles.row} onPress={() => onSelectChat(item.id)}>
-                <View style={styles.avatarCircle}>
-                  {item.photo ? (
-                    <Image source={{ uri: item.photo }} style={styles.avatarImage} />
-                  ) : (
-                    <Text style={styles.avatarEmoji}>{item.avatar}</Text>
-                  )}
-                </View>
-                <View style={styles.rowText}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.preview} numberOfLines={1}>
-                    {lastMessage ? lastMessage.text : 'Say hello! 👋'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.row} onPress={() => onSelectChat(item.matchId)}>
+              <View style={styles.avatarCircle}>
+                {item.photo_url ? (
+                  <Image source={{ uri: item.photo_url }} style={styles.avatarImage} />
+                ) : (
+                  <Text style={styles.avatarEmoji}>{item.avatar_emoji || '🙂'}</Text>
+                )}
+              </View>
+              <View style={styles.rowText}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.preview} numberOfLines={1}>
+                  {item.lastMessage || 'Say hello! 👋'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
         />
       )}
     </View>
   );
 }
 
-function ConversationView({ match, messages, onSend, onBack }) {
+function ConversationView({ userId, match, onBack }) {
   const [text, setText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const listRef = useRef(null);
 
-  const handleSend = () => {
-    if (!text.trim()) return;
-    onSend(text.trim());
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from('messages')
+      .select('*')
+      .eq('match_id', match.matchId)
+      .order('created_at', { ascending: true })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) console.error('Failed to load messages', error);
+        setMessages(data || []);
+        setLoading(false);
+      });
+
+    const channel = supabase
+      .channel(`messages:match:${match.matchId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `match_id=eq.${match.matchId}` },
+        (payload) => {
+          setMessages((prev) => (prev.some((m) => m.id === payload.new.id) ? prev : [...prev, payload.new]));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [match.matchId]);
+
+  const handleSend = async () => {
+    const body = text.trim();
+    if (!body) return;
     setText('');
+    const { error } = await supabase
+      .from('messages')
+      .insert({ match_id: match.matchId, sender_id: userId, body });
+    if (error) {
+      console.error('Failed to send message', error);
+    }
   };
 
   return (
@@ -79,19 +191,27 @@ function ConversationView({ match, messages, onSend, onBack }) {
         <View style={{ width: 50 }} />
       </View>
 
-      <FlatList
-        data={messages}
-        keyExtractor={(_, i) => String(i)}
-        contentContainerStyle={styles.messageList}
-        renderItem={({ item }) => (
-          <View style={[styles.bubble, item.from === 'me' ? styles.bubbleMe : styles.bubbleThem]}>
-            <Text style={[styles.bubbleText, item.from === 'me' && styles.bubbleTextMe]}>{item.text}</Text>
-          </View>
-        )}
-        ListEmptyComponent={
-          <Text style={styles.convoEmpty}>You matched with {match.name}! Say hi 🌸</Text>
-        }
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#E8603A" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          ref={listRef}
+          data={messages}
+          keyExtractor={(item) => String(item.id)}
+          contentContainerStyle={styles.messageList}
+          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
+          renderItem={({ item }) => (
+            <View style={[styles.bubble, item.sender_id === userId ? styles.bubbleMe : styles.bubbleThem]}>
+              <Text style={[styles.bubbleText, item.sender_id === userId && styles.bubbleTextMe]}>
+                {item.body}
+              </Text>
+            </View>
+          )}
+          ListEmptyComponent={
+            <Text style={styles.convoEmpty}>You matched with {match.name}! Say hi 🌸</Text>
+          }
+        />
+      )}
 
       <View style={styles.inputRow}>
         <TextInput
@@ -128,6 +248,7 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
   emptyText: { fontSize: 18, fontWeight: '700', color: '#3D1A0E', marginBottom: 6 },
   emptySubtext: { fontSize: 14, color: '#B87A68', textAlign: 'center' },
+  refreshHint: { fontSize: 12, color: '#E8603A', fontWeight: '600', marginTop: 16 },
   convoHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F5C4B0',

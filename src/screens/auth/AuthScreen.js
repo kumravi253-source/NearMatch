@@ -1,30 +1,58 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform
+  StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
 export default function AuthScreen({ initialMode = 'login', onBack, onSuccess }) {
   const [mode, setMode] = useState(initialMode);
-  const [form, setForm] = useState({ name: '', email: '', password: '', gender: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (mode === 'signup') {
-      if (!form.name || !form.email || !form.password || !form.gender) {
-        Alert.alert('Error', 'Please fill all fields');
-        return;
+  const handleSubmit = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (mode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({
+          email: trimmedEmail,
+          password,
+        });
+        if (error) throw error;
+        if (!data.session) {
+          Alert.alert(
+            'Check your email',
+            'We sent you a confirmation link. Confirm your email, then sign in.'
+          );
+          setMode('login');
+          return;
+        }
+        onSuccess('signup');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
+          password,
+        });
+        if (error) throw error;
+        onSuccess('login');
       }
-      onSuccess('signup');
-    } else {
-      if (!form.email || !form.password) {
-        Alert.alert('Error', 'Please fill all fields');
-        return;
-      }
-      onSuccess('login');
+    } catch (err) {
+      Alert.alert('Error', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const update = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
   return (
     <KeyboardAvoidingView
@@ -45,53 +73,33 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
           {mode === 'login' ? 'Sign in to continue' : 'Create your account'}
         </Text>
 
-        {mode === 'signup' && (
-          <>
-            <TextInput
-              style={styles.input}
-              placeholder="Full Name"
-              placeholderTextColor="#B87A68"
-              value={form.name}
-              onChangeText={v => update('name', v)}
-            />
-            <View style={styles.genderRow}>
-              {['Man', 'Woman', 'Non-binary'].map(g => (
-                <TouchableOpacity
-                  key={g}
-                  style={[styles.genderBtn, form.gender === g && styles.genderBtnActive]}
-                  onPress={() => update('gender', g)}
-                >
-                  <Text style={[styles.genderText, form.gender === g && styles.genderTextActive]}>
-                    {g}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </>
-        )}
-
         <TextInput
           style={styles.input}
           placeholder="Email Address"
           placeholderTextColor="#B87A68"
-          value={form.email}
-          onChangeText={v => update('email', v)}
+          value={email}
+          onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
           placeholderTextColor="#B87A68"
-          value={form.password}
-          onChangeText={v => update('password', v)}
+          value={password}
+          onChangeText={setPassword}
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
-          <Text style={styles.btnText}>
-            {mode === 'login' ? 'Sign In' : 'Create Account'}
-          </Text>
+        <TouchableOpacity style={styles.btn} onPress={handleSubmit} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.btnText}>
+              {mode === 'login' ? 'Sign In' : 'Create Account'}
+            </Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.switchRow}>
@@ -119,17 +127,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF0EA', borderWidth: 1.5, borderColor: '#F5C4B0',
     borderRadius: 12, padding: 14, fontSize: 14, color: '#3D1A0E', marginBottom: 12,
   },
-  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-  genderBtn: {
-    flex: 1, borderWidth: 1.5, borderColor: '#F5C4B0',
-    borderRadius: 12, padding: 10, alignItems: 'center', backgroundColor: '#FFFFFF',
-  },
-  genderBtnActive: { backgroundColor: '#FDDDD4', borderColor: '#E8603A' },
-  genderText: { fontSize: 13, color: '#8C4A35' },
-  genderTextActive: { color: '#E8603A', fontWeight: '600' },
   btn: {
     backgroundColor: '#E8603A', borderRadius: 12, padding: 15,
-    alignItems: 'center', marginBottom: 16, marginTop: 4,
+    alignItems: 'center', marginBottom: 16, marginTop: 4, minHeight: 50, justifyContent: 'center',
   },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },

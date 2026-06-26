@@ -1,31 +1,95 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
-export default function MatchesScreen({ matches, onOpenChat }) {
+export default function MatchesScreen({ userId, active, onOpenChat }) {
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadMatches = useCallback(async () => {
+    const { data: matchRows, error: matchError } = await supabase
+      .from('matches')
+      .select('id, user_a, user_b, created_at')
+      .or(`user_a.eq.${userId},user_b.eq.${userId}`)
+      .order('created_at', { ascending: false });
+
+    if (matchError) {
+      console.error('Failed to load matches', matchError);
+      setMatches([]);
+      return;
+    }
+
+    const otherUserIds = (matchRows || []).map((m) => (m.user_a === userId ? m.user_b : m.user_a));
+    if (otherUserIds.length === 0) {
+      setMatches([]);
+      return;
+    }
+
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('id', otherUserIds);
+
+    if (profilesError) {
+      console.error('Failed to load match profiles', profilesError);
+      setMatches([]);
+      return;
+    }
+
+    const profileById = new Map((profiles || []).map((p) => [p.id, p]));
+    const merged = matchRows
+      .map((m) => {
+        const otherId = m.user_a === userId ? m.user_b : m.user_a;
+        const profile = profileById.get(otherId);
+        return profile ? { matchId: m.id, ...profile } : null;
+      })
+      .filter(Boolean);
+
+    setMatches(merged);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!active) return;
+    setLoading(true);
+    loadMatches().finally(() => setLoading(false));
+  }, [active, loadMatches]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadMatches();
+    setRefreshing(false);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Your Matches 💛</Text>
 
-      {matches.length === 0 ? (
-        <View style={styles.emptyState}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#E8603A" style={{ marginTop: 40 }} />
+      ) : matches.length === 0 ? (
+        <TouchableOpacity style={styles.emptyState} onPress={handleRefresh} disabled={refreshing}>
           <Text style={styles.emptyEmoji}>💌</Text>
           <Text style={styles.emptyText}>No matches yet</Text>
           <Text style={styles.emptySubtext}>Keep swiping to find your match!</Text>
-        </View>
+          <Text style={styles.refreshHint}>{refreshing ? 'Refreshing…' : 'Tap to refresh'}</Text>
+        </TouchableOpacity>
       ) : (
         <FlatList
           data={matches}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.matchId)}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.list}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => onOpenChat(item)}>
+            <TouchableOpacity style={styles.card} onPress={() => onOpenChat(item.matchId)}>
               <View style={styles.avatarCircle}>
-                {item.photo ? (
-                  <Image source={{ uri: item.photo }} style={styles.avatarImage} />
+                {item.photo_url ? (
+                  <Image source={{ uri: item.photo_url }} style={styles.avatarImage} />
                 ) : (
-                  <Text style={styles.avatarEmoji}>{item.avatar}</Text>
+                  <Text style={styles.avatarEmoji}>{item.avatar_emoji || '🙂'}</Text>
                 )}
               </View>
               <Text style={styles.name}>{item.name}, {item.age}</Text>
@@ -59,4 +123,5 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
   emptyText: { fontSize: 18, fontWeight: '700', color: '#3D1A0E', marginBottom: 6 },
   emptySubtext: { fontSize: 14, color: '#B87A68', textAlign: 'center' },
+  refreshHint: { fontSize: 12, color: '#E8603A', fontWeight: '600', marginTop: 16 },
 });

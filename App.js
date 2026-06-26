@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { supabase } from './src/lib/supabase';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
 import SwipeScreen from './src/screens/swipe/SwipeScreen';
@@ -14,47 +15,84 @@ const TABS = [
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState('splash');
+  const [session, setSession] = useState(undefined);
+  const [profile, setProfile] = useState(undefined);
+  const [splashScreen, setSplashScreen] = useState('splash');
   const [authMode, setAuthMode] = useState('login');
   const [tab, setTab] = useState('swipe');
-  const [matches, setMatches] = useState([]);
-  const [conversations, setConversations] = useState({});
   const [selectedChatId, setSelectedChatId] = useState(null);
 
-  const handleAuthSuccess = (mode) => {
-    setScreen(mode === 'signup' ? 'profileSetup' : 'main');
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session ?? null));
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+    return () => subscription.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (session === undefined) return;
+    if (session === null) {
+      setProfile(undefined);
+      setSplashScreen('splash');
+      setTab('swipe');
+      setSelectedChatId(null);
+      return;
+    }
+    let cancelled = false;
+    setProfile(undefined);
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.error('Failed to load profile', error);
+        }
+        setProfile(data ?? null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
+
+  const handleProfileComplete = (savedProfile) => {
+    setProfile(savedProfile);
   };
 
-  const handleProfileComplete = () => {
-    setScreen('main');
-  };
-
-  const handleMatch = (profile) => {
-    setMatches((prev) => (prev.find((m) => m.id === profile.id) ? prev : [...prev, profile]));
-  };
-
-  const handleOpenChat = (match) => {
-    setSelectedChatId(match.id);
+  const handleOpenChat = (matchId) => {
+    setSelectedChatId(matchId);
     setTab('chat');
   };
 
-  const handleSendMessage = (matchId, text) => {
-    setConversations((prev) => ({
-      ...prev,
-      [matchId]: [...(prev[matchId] || []), { from: 'me', text }],
-    }));
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
   };
 
-  if (screen === 'splash') {
+  if (session === undefined || (session && profile === undefined)) {
+    return (
+      <View style={styles.splash}>
+        <StatusBar style="auto" />
+        <ActivityIndicator size="large" color="#E8603A" />
+      </View>
+    );
+  }
+
+  if (session === null) {
+    if (splashScreen === 'auth') {
+      return <AuthScreen initialMode={authMode} onBack={() => setSplashScreen('splash')} onSuccess={() => {}} />;
+    }
     return (
       <View style={styles.splash}>
         <StatusBar style="auto" />
         <Text style={styles.logo}>🌸 NearMatch</Text>
         <Text style={styles.tagline}>Warm connections, just around the corner</Text>
-        <TouchableOpacity style={styles.btnPrimary} onPress={() => { setAuthMode('signup'); setScreen('auth'); }}>
+        <TouchableOpacity style={styles.btnPrimary} onPress={() => { setAuthMode('signup'); setSplashScreen('auth'); }}>
           <Text style={styles.btnPrimaryText}>Create Account</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btnSecondary} onPress={() => { setAuthMode('login'); setScreen('auth'); }}>
+        <TouchableOpacity style={styles.btnSecondary} onPress={() => { setAuthMode('login'); setSplashScreen('auth'); }}>
           <Text style={styles.btnSecondaryText}>Sign In</Text>
         </TouchableOpacity>
         <Text style={styles.terms}>By continuing, you agree to our Terms & Privacy Policy</Text>
@@ -62,18 +100,8 @@ export default function App() {
     );
   }
 
-  if (screen === 'auth') {
-    return (
-      <AuthScreen
-        initialMode={authMode}
-        onBack={() => setScreen('splash')}
-        onSuccess={handleAuthSuccess}
-      />
-    );
-  }
-
-  if (screen === 'profileSetup') {
-    return <ProfileSetupScreen onComplete={handleProfileComplete} />;
+  if (profile === null) {
+    return <ProfileSetupScreen userId={session.user.id} onComplete={handleProfileComplete} />;
   }
 
   return (
@@ -81,16 +109,15 @@ export default function App() {
       <StatusBar style="auto" />
       <View style={styles.tabContent}>
         <View style={tab === 'swipe' ? styles.tabPane : styles.tabPaneHidden}>
-          <SwipeScreen onMatch={handleMatch} />
+          <SwipeScreen userId={session.user.id} onSignOut={handleSignOut} />
         </View>
         <View style={tab === 'matches' ? styles.tabPane : styles.tabPaneHidden}>
-          <MatchesScreen matches={matches} onOpenChat={handleOpenChat} />
+          <MatchesScreen userId={session.user.id} active={tab === 'matches'} onOpenChat={handleOpenChat} />
         </View>
         <View style={tab === 'chat' ? styles.tabPane : styles.tabPaneHidden}>
           <ChatScreen
-            matches={matches}
-            conversations={conversations}
-            onSendMessage={handleSendMessage}
+            userId={session.user.id}
+            active={tab === 'chat'}
             selectedChatId={selectedChatId}
             onSelectChat={setSelectedChatId}
           />

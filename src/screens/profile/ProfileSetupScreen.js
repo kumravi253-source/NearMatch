@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, KeyboardAvoidingView, Platform, Alert, Image,
+  ScrollView, KeyboardAvoidingView, Platform, Alert, Image, ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { supabase } from '../../lib/supabase';
 
 const INTEREST_OPTIONS = [
   'Travel', 'Music', 'Movies', 'Foodie', 'Fitness', 'Art',
@@ -11,14 +12,17 @@ const INTEREST_OPTIONS = [
 ];
 
 const AVATAR_OPTIONS = ['🙂', '😎', '🥳', '🌸', '🌻', '🦋'];
+const GENDER_OPTIONS = ['Man', 'Woman', 'Non-binary'];
 
-export default function ProfileSetupScreen({ onComplete }) {
+export default function ProfileSetupScreen({ userId, onComplete }) {
   const [avatar, setAvatar] = useState(AVATAR_OPTIONS[0]);
   const [photoUri, setPhotoUri] = useState(null);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [gender, setGender] = useState('');
   const [bio, setBio] = useState('');
   const [interests, setInterests] = useState([]);
+  const [saving, setSaving] = useState(false);
 
   const toggleInterest = (interest) => {
     setInterests((prev) =>
@@ -45,16 +49,62 @@ export default function ProfileSetupScreen({ onComplete }) {
     }
   };
 
-  const handleContinue = () => {
-    if (!name || !age || !bio) {
+  const uploadPhoto = async () => {
+    const response = await fetch(photoUri);
+    const arrayBuffer = await response.arrayBuffer();
+    const path = `${userId}/profile.jpg`;
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, arrayBuffer, { contentType: 'image/jpeg', upsert: true });
+    if (uploadError) throw uploadError;
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    return `${data.publicUrl}?v=${Date.now()}`;
+  };
+
+  const handleContinue = async () => {
+    if (!name || !age || !gender || !bio) {
       Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    const ageNum = parseInt(age, 10);
+    if (!Number.isInteger(ageNum) || ageNum < 18 || ageNum > 120) {
+      Alert.alert('Error', 'Please enter a valid age (18 or older)');
       return;
     }
     if (interests.length === 0) {
       Alert.alert('Error', 'Pick at least one interest');
       return;
     }
-    onComplete({ avatar, photoUri, name, age, bio, interests });
+
+    setSaving(true);
+    try {
+      let photoUrl = null;
+      if (photoUri) {
+        photoUrl = await uploadPhoto();
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          name,
+          age: ageNum,
+          gender,
+          bio,
+          avatar_emoji: avatar,
+          photo_url: photoUrl,
+          interests,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      onComplete(data);
+    } catch (err) {
+      Alert.alert('Error', err.message || 'Could not save your profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -96,8 +146,22 @@ export default function ProfileSetupScreen({ onComplete }) {
         <TextInput
           style={styles.input} placeholder="Age"
           placeholderTextColor="#B87A68" value={age} onChangeText={setAge}
-          keyboardType="number-pad" maxLength={2}
+          keyboardType="number-pad" maxLength={3}
         />
+
+        <Text style={styles.label}>I am a</Text>
+        <View style={styles.genderRow}>
+          {GENDER_OPTIONS.map((g) => (
+            <TouchableOpacity
+              key={g}
+              style={[styles.genderBtn, gender === g && styles.genderBtnActive]}
+              onPress={() => setGender(g)}
+            >
+              <Text style={[styles.genderText, gender === g && styles.genderTextActive]}>{g}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <TextInput
           style={[styles.input, styles.bioInput]} placeholder="A little about you..."
           placeholderTextColor="#B87A68" value={bio} onChangeText={setBio}
@@ -117,8 +181,8 @@ export default function ProfileSetupScreen({ onComplete }) {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.btn} onPress={handleContinue}>
-          <Text style={styles.btnText}>Continue</Text>
+        <TouchableOpacity style={styles.btn} onPress={handleContinue} disabled={saving}>
+          {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Continue</Text>}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -155,6 +219,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF0EA', borderWidth: 1.5, borderColor: '#F5C4B0',
     borderRadius: 12, padding: 14, fontSize: 14, color: '#3D1A0E', marginBottom: 12,
   },
+  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  genderBtn: {
+    flex: 1, borderWidth: 1.5, borderColor: '#F5C4B0',
+    borderRadius: 12, padding: 10, alignItems: 'center', backgroundColor: '#FFFFFF',
+  },
+  genderBtnActive: { backgroundColor: '#FDDDD4', borderColor: '#E8603A' },
+  genderText: { fontSize: 13, color: '#8C4A35' },
+  genderTextActive: { color: '#E8603A', fontWeight: '600' },
   bioInput: { height: 90, textAlignVertical: 'top' },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 28 },
   chip: {
@@ -164,6 +236,6 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: '#E8603A', borderColor: '#E8603A' },
   chipText: { fontSize: 13, color: '#8C4A35' },
   chipTextActive: { color: '#fff', fontWeight: '600' },
-  btn: { backgroundColor: '#E8603A', borderRadius: 14, padding: 16, alignItems: 'center' },
+  btn: { backgroundColor: '#E8603A', borderRadius: 14, padding: 16, alignItems: 'center', minHeight: 52, justifyContent: 'center' },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
