@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NearMatch — Warm connections, just around the corner</title>
+<meta name="description" content="NearMatch is a dating app built on real safety: AI-verified profiles, encrypted real-time chat, and built-in moderation — not just another swipe deck.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">NearMatch</a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#safety">Trust &amp; Safety</a>
+      <a href="#preview">App Preview</a>
+      <a href="support.html">Support</a>
+      <a href="#download" class="nav-cta">Get Notified</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">🌸 Coming soon to iOS</span>
+      <h1>Warm connections,<br><span class="accent">just around the corner.</span></h1>
+      <p class="lead">NearMatch is a dating app built the way dating apps should have been built from day one — real verification, real moderation, and a real backend behind every swipe.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#download">Get notified at launch</a>
+        <a class="btn btn-secondary" href="#safety">See how we keep it safe</a>
+      </div>
+    </div>
+    <div class="hero-phone-wrap">
+      <div class="float-card verified">✓ Verified — AI age check</div>
+      <div class="float-card match">🎉 It's a match!</div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="mock-header">
+            <span style="width:50px"></span>
+            <span class="mock-title">Discover 🌸</span>
+            <span style="width:50px; text-align:right;" class="mock-pill">✓ Verified</span>
+          </div>
+          <div class="mock-card">
+            <div class="mock-photo">🌻</div>
+            <div class="mock-info">
+              <div class="mock-name">Maya, 27 <span class="mock-badge">✓</span></div>
+              <div class="mock-bio">Coffee enthusiast, weekend hiker, always up for the new ramen spot.</div>
+              <div class="mock-chips">
+                <span class="mock-chip">Coffee</span>
+                <span class="mock-chip">Hiking</span>
+                <span class="mock-chip">Foodie</span>
+              </div>
+            </div>
+          </div>
+          <div class="mock-actions">
+            <div class="mock-fab">✕</div>
+            <div class="mock-fab like">♥</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">What you get</span>
+      <h2>Everything a modern dating app needs</h2>
+      <p>Built on a real backend, not a prototype — every feature below runs on live infrastructure today.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon coral">🔥</div>
+        <h3>Smart discovery</h3>
+        <p>A candidate feed that excludes people you've already swiped on or matched with, so you always see someone new.</p>
+      </div>
+      <div class="card">
+        <div class="icon coral">💛</div>
+        <h3>Real mutual matching</h3>
+        <p>Matches are created server-side the moment two people like each other — never faked, never client-controlled.</p>
+      </div>
+      <div class="card">
+        <div class="icon coral">💬</div>
+        <h3>Live, real-time chat</h3>
+        <p>Messages land instantly over a live connection, not a refresh-and-hope polling loop.</p>
+      </div>
+      <div class="card">
+        <div class="icon teal">🪪</div>
+        <h3>Real photo profiles</h3>
+        <p>Upload an actual photo or pick an avatar — profiles are backed by real storage, not placeholder data.</p>
+      </div>
+      <div class="card">
+        <div class="icon teal">✅</div>
+        <h3>AI age verification</h3>
+        <p>An optional selfie check estimates age via a dedicated face-detection service and adds a visible Verified badge.</p>
+      </div>
+      <div class="card">
+        <div class="icon teal">🛡️</div>
+        <h3>Block &amp; report built in</h3>
+        <p>Every profile and conversation has a safety menu — blocking is enforced at the database level, not just the UI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>From sign-up to first message</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Create an account</h4>
+        <p>Sign up with email, confirm it, and confirm you're 18 or older.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Build your profile</h4>
+        <p>Add a photo or pick an avatar, write a bio, choose your interests.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Swipe to discover</h4>
+        <p>Browse real nearby profiles and like the ones you're interested in.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Match &amp; chat</h4>
+        <p>When it's mutual, start chatting instantly — no extra steps.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Trust &amp; Safety</span>
+      <h2>Safety isn't a checkbox here — it's the architecture</h2>
+      <p>Most of the engineering effort in NearMatch went into the parts you never see directly.</p>
+    </div>
+    <div class="safety-grid">
+      <ul class="safety-list">
+        <li class="safety-item">
+          <div class="dot">18+</div>
+          <div>
+            <h4>Explicit age attestation</h4>
+            <p>Every signup requires an affirmative, timestamped 18+ confirmation — recorded, not assumed.</p>
+          </div>
+        </li>
+        <li class="safety-item">
+          <div class="dot">🤳</div>
+          <div>
+            <h4>Optional AI selfie verification</h4>
+            <p>A face-detection check estimates age conservatively and only confirms a badge when it clears a safety margin above 18. The photo is never stored.</p>
+          </div>
+        </li>
+        <li class="safety-item">
+          <div class="dot">⛔</div>
+          <div>
+            <h4>Real blocking, enforced everywhere</h4>
+            <p>Blocking isn't just a UI filter — it's checked at the database level for matching and messaging, so a blocked pair can't reconnect through any path.</p>
+          </div>
+        </li>
+        <li class="safety-item">
+          <div class="dot">🚩</div>
+          <div>
+            <h4>One-tap reporting</h4>
+            <p>Report inappropriate photos, harassment, fake profiles, or spam directly from any profile or conversation.</p>
+          </div>
+        </li>
+        <li class="safety-item">
+          <div class="dot">⏱️</div>
+          <div>
+            <h4>Rate limiting against spam &amp; bots</h4>
+            <p>Swipes and messages are throttled server-side, making large-scale spam or scraping impractical.</p>
+          </div>
+        </li>
+      </ul>
+      <div class="phone" style="width:260px; height:540px;">
+        <div class="phone-screen">
+          <div class="mock-header" style="justify-content:center;">
+            <span class="mock-title">Verify your age 🌸</span>
+          </div>
+          <div style="text-align:center; font-size:12px; color:var(--text-secondary); margin-bottom:18px;">
+            Take a quick selfie to get a Verified badge. The photo is never stored.
+          </div>
+          <div style="width:160px; height:160px; border-radius:80px; background:var(--coral-light); border:2px solid var(--coral-border); margin:0 auto 24px; display:flex; align-items:center; justify-content:center; font-size:48px;">🤳</div>
+          <div style="border:1.5px solid var(--teal); border-radius:14px; padding:12px; text-align:center; font-size:13px; font-weight:700; color:var(--teal-dark); margin-bottom:10px;">Take Selfie</div>
+          <div style="background:var(--coral); border-radius:14px; padding:12px; text-align:center; font-size:13px; font-weight:700; color:var(--white);">Verify</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="preview" class="section-alt">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">App preview</span>
+      <h2>A closer look</h2>
+    </div>
+    <div class="preview-strip">
+      <div>
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="mock-header">
+              <span style="width:50px"></span>
+              <span class="mock-title">Discover 🌸</span>
+              <span style="width:50px"></span>
+            </div>
+            <div class="mock-card">
+              <div class="mock-photo">😎</div>
+              <div class="mock-info">
+                <div class="mock-name">Jordan, 29 <span class="mock-badge">✓</span></div>
+                <div class="mock-bio">Photographer by day, board game nerd by night.</div>
+                <div class="mock-chips">
+                  <span class="mock-chip">Travel</span>
+                  <span class="mock-chip">Art</span>
+                </div>
+              </div>
+            </div>
+            <div class="mock-actions">
+              <div class="mock-fab">✕</div>
+              <div class="mock-fab like">♥</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-caption">Discover</div>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="mock-header" style="justify-content:center;"><span class="mock-title">Your Matches 💛</span></div>
+            <div class="mock-list-item">
+              <div class="mock-avatar">😎</div>
+              <div class="mock-list-text">
+                <div class="mock-list-name">Jordan, 29 ✓</div>
+                <div class="mock-list-sub">It's a match!</div>
+              </div>
+            </div>
+            <div class="mock-list-item">
+              <div class="mock-avatar">🦋</div>
+              <div class="mock-list-text">
+                <div class="mock-list-name">Riley, 26 ✓</div>
+                <div class="mock-list-sub">It's a match!</div>
+              </div>
+            </div>
+            <div class="mock-list-item">
+              <div class="mock-avatar">🌻</div>
+              <div class="mock-list-text">
+                <div class="mock-list-name">Maya, 27</div>
+                <div class="mock-list-sub">It's a match!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-caption">Matches</div>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="mock-header" style="justify-content:center;"><span class="mock-title">Jordan</span></div>
+            <div class="mock-chat-body">
+              <div class="mock-bubble them">Hey Maya! Loved your hiking photos 🌲</div>
+              <div class="mock-bubble me">That trail near the ridge was unreal. You into hiking too?</div>
+              <div class="mock-bubble them">Always down for a good trail. Coffee first though ☕</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-caption">Chat</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Be first in line when NearMatch launches</h2>
+      <p>We're finishing up testing now. No spam, no fake countdown timers — just an honest heads-up when it's live.</p>
+      <span class="coming-soon-pill">📱 iOS — coming soon via TestFlight</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">NearMatch</div>
+        <p class="footer-tagline">Warm connections, just around the corner. Built with real safety at the core, not bolted on after.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Product</h5>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#safety">Trust &amp; Safety</a>
+          <a href="index.html#preview">App Preview</a>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <a href="support.html">Support</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NearMatch. All rights reserved.</span>
+      <span>Made for people who want dating apps to take safety seriously.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
