@@ -4,6 +4,7 @@ import {
   TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { COLORS, FONTS } from '../../theme/theme';
 
 const REPORT_REASONS = [
   { label: 'Inappropriate photos', value: 'inappropriate_photos' },
@@ -116,7 +117,7 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
       <Text style={styles.header}>Messages 💬</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#E8603A" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color={COLORS.coral} style={{ marginTop: 40 }} />
       ) : matches.length === 0 ? (
         <TouchableOpacity style={styles.emptyState} onPress={handleRefresh} disabled={refreshing}>
           <Text style={styles.emptyEmoji}>🌸</Text>
@@ -274,7 +275,7 @@ function ConversationView({ userId, match, onBack, onBlocked }) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#E8603A" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color={COLORS.coral} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           ref={listRef}
@@ -298,7 +299,7 @@ function ConversationView({ userId, match, onBack, onBlocked }) {
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input} placeholder="Type a message..."
-          placeholderTextColor="#B87A68" value={text} onChangeText={setText}
+          placeholderTextColor={COLORS.textSecondary} value={text} onChangeText={setText}
           onSubmitEditing={handleSend}
         />
         <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
@@ -310,53 +311,53 @@ function ConversationView({ userId, match, onBack, onBlocked }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F0', paddingTop: 60 },
-  header: { fontSize: 22, fontWeight: '700', color: '#E8603A', textAlign: 'center', marginBottom: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center', marginBottom: 16 },
   list: { paddingHorizontal: 16 },
   row: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF',
-    borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1.5, borderColor: '#F5C4B0',
+    flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.card,
+    borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1.5, borderColor: COLORS.coralBorder,
   },
   avatarCircle: {
-    width: 52, height: 52, borderRadius: 26, backgroundColor: '#FDDDD4',
+    width: 52, height: 52, borderRadius: 26, backgroundColor: COLORS.coralLight,
     alignItems: 'center', justifyContent: 'center', marginRight: 12, overflow: 'hidden',
   },
   avatarImage: { width: 52, height: 52 },
   avatarEmoji: { fontSize: 26 },
   rowText: { flex: 1 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  name: { fontSize: 15, fontWeight: '700', color: '#3D1A0E' },
+  name: { fontFamily: FONTS.bold, fontSize: 15, color: COLORS.textPrimary },
   badge: {
-    fontSize: 10, fontWeight: '700', color: '#3DBE6B', backgroundColor: '#E7F7EC',
+    fontFamily: FONTS.bold, fontSize: 10, color: COLORS.success, backgroundColor: COLORS.successLight,
     borderRadius: 8, paddingHorizontal: 5, paddingVertical: 2,
   },
-  preview: { fontSize: 13, color: '#B87A68', marginTop: 2 },
+  preview: { fontFamily: FONTS.regular, fontSize: 13, color: COLORS.textSecondary, marginTop: 2 },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#3D1A0E', marginBottom: 6 },
-  emptySubtext: { fontSize: 14, color: '#B87A68', textAlign: 'center' },
-  refreshHint: { fontSize: 12, color: '#E8603A', fontWeight: '600', marginTop: 16 },
+  emptyText: { fontFamily: FONTS.bold, fontSize: 18, color: COLORS.textPrimary, marginBottom: 6 },
+  emptySubtext: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center' },
+  refreshHint: { fontFamily: FONTS.bold, fontSize: 12, color: COLORS.coral, marginTop: 16 },
   convoHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F5C4B0',
+    paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: COLORS.coralBorder,
   },
   backBtn: { width: 50 },
   convoMenuBtn: { width: 50, alignItems: 'flex-end' },
-  convoMenuText: { fontSize: 22, color: '#B87A68', fontWeight: '700' },
-  backText: { fontSize: 15, color: '#E8603A', fontWeight: '600' },
-  convoName: { fontSize: 17, fontWeight: '700', color: '#3D1A0E' },
+  convoMenuText: { fontSize: 22, color: COLORS.textSecondary, fontFamily: FONTS.bold },
+  backText: { fontFamily: FONTS.bold, fontSize: 15, color: COLORS.coral },
+  convoName: { fontFamily: FONTS.bold, fontSize: 17, color: COLORS.textPrimary },
   messageList: { padding: 16, flexGrow: 1, justifyContent: 'flex-end' },
-  convoEmpty: { textAlign: 'center', color: '#B87A68', marginTop: 40, fontStyle: 'italic' },
-  bubble: { maxWidth: '75%', borderRadius: 16, padding: 12, marginBottom: 8 },
-  bubbleThem: { backgroundColor: '#FFFFFF', borderWidth: 1.5, borderColor: '#F5C4B0', alignSelf: 'flex-start' },
-  bubbleMe: { backgroundColor: '#E8603A', alignSelf: 'flex-end' },
-  bubbleText: { fontSize: 14, color: '#3D1A0E' },
-  bubbleTextMe: { color: '#fff' },
-  inputRow: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: '#F5C4B0' },
+  convoEmpty: { fontFamily: FONTS.medium, textAlign: 'center', color: COLORS.teal, marginTop: 40 },
+  bubble: { maxWidth: '75%', borderRadius: 18, padding: 12, marginBottom: 8 },
+  bubbleThem: { backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.coralBorder, alignSelf: 'flex-start' },
+  bubbleMe: { backgroundColor: COLORS.coral, alignSelf: 'flex-end' },
+  bubbleText: { fontFamily: FONTS.medium, fontSize: 14, color: COLORS.textPrimary },
+  bubbleTextMe: { color: COLORS.white },
+  inputRow: { flexDirection: 'row', padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: COLORS.coralBorder },
   input: {
-    flex: 1, backgroundColor: '#FEF0EA', borderWidth: 1.5, borderColor: '#F5C4B0',
-    borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 14, color: '#3D1A0E',
+    flex: 1, backgroundColor: COLORS.inputBg, borderWidth: 1.5, borderColor: COLORS.coralBorder,
+    borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 14, fontFamily: FONTS.medium, color: COLORS.textPrimary,
   },
-  sendBtn: { backgroundColor: '#E8603A', borderRadius: 20, paddingHorizontal: 18, justifyContent: 'center' },
-  sendBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  sendBtn: { backgroundColor: COLORS.teal, borderRadius: 20, paddingHorizontal: 18, justifyContent: 'center' },
+  sendBtnText: { color: COLORS.white, fontFamily: FONTS.bold, fontSize: 14 },
 });

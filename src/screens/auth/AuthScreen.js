@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { AGE_ATTESTATION_TEXT } from '../../lib/legal';
+import { COLORS, FONTS } from '../../theme/theme';
 
 export default function AuthScreen({ initialMode = 'login', onBack, onSuccess }) {
   const [mode, setMode] = useState(initialMode);
@@ -71,7 +72,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
             <Text style={styles.backText}>← Back</Text>
           </TouchableOpacity>
         )}
-        <Text style={styles.logo}>🌸 NearMatch</Text>
+        <Text style={styles.logo}>NearMatch</Text>
         <Text style={styles.title}>
           {mode === 'login' ? 'Welcome back 💛' : 'Join NearMatch 🌸'}
         </Text>
@@ -82,7 +83,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
         <TextInput
           style={styles.input}
           placeholder="Email Address"
-          placeholderTextColor="#B87A68"
+          placeholderTextColor={COLORS.textSecondary}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -92,7 +93,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
         <TextInput
           style={styles.input}
           placeholder="Password"
-          placeholderTextColor="#B87A68"
+          placeholderTextColor={COLORS.textSecondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -113,7 +114,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
 
         <TouchableOpacity style={styles.btn} onPress={handleSubmit} disabled={loading}>
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={COLORS.white} />
           ) : (
             <Text style={styles.btnText}>
               {mode === 'login' ? 'Sign In' : 'Create Account'}
@@ -137,34 +138,34 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F0' },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  logo: { fontSize: 36, fontWeight: '800', color: '#E8603A', textAlign: 'center', marginBottom: 6 },
-  title: { fontSize: 24, fontWeight: '700', color: '#3D1A0E', textAlign: 'center', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#B87A68', textAlign: 'center', marginBottom: 32, fontStyle: 'italic' },
+  logo: { fontFamily: FONTS.logo, fontSize: 38, color: COLORS.coral, textAlign: 'center', marginBottom: 10 },
+  title: { fontFamily: FONTS.bold, fontSize: 24, color: COLORS.textPrimary, textAlign: 'center', marginBottom: 4 },
+  subtitle: { fontFamily: FONTS.medium, fontSize: 14, color: COLORS.teal, textAlign: 'center', marginBottom: 32 },
   input: {
-    backgroundColor: '#FEF0EA', borderWidth: 1.5, borderColor: '#F5C4B0',
-    borderRadius: 12, padding: 14, fontSize: 14, color: '#3D1A0E', marginBottom: 12,
+    backgroundColor: COLORS.inputBg, borderWidth: 1.5, borderColor: COLORS.coralBorder,
+    borderRadius: 14, padding: 14, fontSize: 14, fontFamily: FONTS.medium, color: COLORS.textPrimary, marginBottom: 12,
   },
   attestRow: {
     flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16, paddingRight: 8,
   },
   checkbox: {
-    width: 20, height: 20, borderRadius: 5, borderWidth: 1.5, borderColor: '#F5C4B0',
-    backgroundColor: '#FEF0EA', alignItems: 'center', justifyContent: 'center',
+    width: 20, height: 20, borderRadius: 6, borderWidth: 1.5, borderColor: COLORS.coralBorder,
+    backgroundColor: COLORS.inputBg, alignItems: 'center', justifyContent: 'center',
     marginRight: 10, marginTop: 1,
   },
-  checkboxChecked: { backgroundColor: '#E8603A', borderColor: '#E8603A' },
-  checkboxMark: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  attestText: { flex: 1, fontSize: 12, color: '#8C4A35', lineHeight: 17 },
+  checkboxChecked: { backgroundColor: COLORS.coral, borderColor: COLORS.coral },
+  checkboxMark: { color: COLORS.white, fontSize: 13, fontFamily: FONTS.bold },
+  attestText: { flex: 1, fontSize: 12, fontFamily: FONTS.regular, color: COLORS.textSecondary, lineHeight: 17 },
   btn: {
-    backgroundColor: '#E8603A', borderRadius: 12, padding: 15,
+    backgroundColor: COLORS.coral, borderRadius: 16, padding: 15,
     alignItems: 'center', marginBottom: 16, marginTop: 4, minHeight: 50, justifyContent: 'center',
   },
-  btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  btnText: { color: COLORS.white, fontSize: 16, fontFamily: FONTS.bold },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
-  switchText: { fontSize: 13, color: '#B87A68' },
-  switchLink: { fontSize: 13, color: '#E8603A', fontWeight: '700' },
+  switchText: { fontFamily: FONTS.regular, fontSize: 13, color: COLORS.textSecondary },
+  switchLink: { fontFamily: FONTS.bold, fontSize: 13, color: COLORS.teal },
   backBtn: { marginBottom: 20 },
-  backText: { fontSize: 16, color: '#E8603A', fontWeight: '600' },
+  backText: { fontFamily: FONTS.bold, fontSize: 16, color: COLORS.coral },
 })

@@ -33,7 +33,8 @@
           "photosPermission": "NearMatch needs access to your photos so you can set a profile picture.",
           "cameraPermission": "NearMatch needs access to your camera so you can take a profile picture."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {

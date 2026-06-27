@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { COLORS, FONTS } from '../../theme/theme';
 
 export default function MatchesScreen({ userId, active, onOpenChat }) {
   const [matches, setMatches] = useState([]);
@@ -73,7 +74,7 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
       <Text style={styles.header}>Your Matches 💛</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#E8603A" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color={COLORS.coral} style={{ marginTop: 40 }} />
       ) : matches.length === 0 ? (
         <TouchableOpacity style={styles.emptyState} onPress={handleRefresh} disabled={refreshing}>
           <Text style={styles.emptyEmoji}>💌</Text>
@@ -113,30 +114,30 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F0', paddingTop: 60 },
-  header: { fontSize: 22, fontWeight: '700', color: '#E8603A', textAlign: 'center', marginBottom: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center', marginBottom: 16 },
   list: { paddingHorizontal: 16, paddingBottom: 20 },
   row: { gap: 12, marginBottom: 12 },
   card: {
-    flex: 1, backgroundColor: '#FFFFFF', borderRadius: 18, padding: 16,
-    alignItems: 'center', borderWidth: 1.5, borderColor: '#F5C4B0',
+    flex: 1, backgroundColor: COLORS.card, borderRadius: 18, padding: 16,
+    alignItems: 'center', borderWidth: 1.5, borderColor: COLORS.coralBorder,
   },
   avatarCircle: {
-    width: 72, height: 72, borderRadius: 36, backgroundColor: '#FDDDD4',
+    width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.coralLight,
     alignItems: 'center', justifyContent: 'center', marginBottom: 10, overflow: 'hidden',
   },
   avatarImage: { width: 72, height: 72 },
   avatarEmoji: { fontSize: 36 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  name: { fontSize: 15, fontWeight: '700', color: '#3D1A0E' },
+  name: { fontFamily: FONTS.bold, fontSize: 15, color: COLORS.textPrimary },
   badge: {
-    fontSize: 10, fontWeight: '700', color: '#3DBE6B', backgroundColor: '#E7F7EC',
+    fontFamily: FONTS.bold, fontSize: 10, color: COLORS.success, backgroundColor: COLORS.successLight,
     borderRadius: 8, paddingHorizontal: 5, paddingVertical: 2,
   },
-  subtext: { fontSize: 12, color: '#E8603A', marginTop: 2 },
+  subtext: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.teal, marginTop: 2 },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#3D1A0E', marginBottom: 6 },
-  emptySubtext: { fontSize: 14, color: '#B87A68', textAlign: 'center' },
-  refreshHint: { fontSize: 12, color: '#E8603A', fontWeight: '600', marginTop: 16 },
+  emptyText: { fontFamily: FONTS.bold, fontSize: 18, color: COLORS.textPrimary, marginBottom: 6 },
+  emptySubtext: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center' },
+  refreshHint: { fontFamily: FONTS.bold, fontSize: 12, color: COLORS.coral, marginTop: 16 },
 });

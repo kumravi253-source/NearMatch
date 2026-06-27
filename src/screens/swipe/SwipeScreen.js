@@ -4,6 +4,7 @@ import {
   Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { COLORS, FONTS } from '../../theme/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
@@ -195,7 +196,7 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
       </View>
 
       <View style={styles.cardArea}>
-        {loading && <ActivityIndicator size="large" color="#E8603A" />}
+        {loading && <ActivityIndicator size="large" color={COLORS.coral} />}
 
         {!loading && !profile && (
           <View style={styles.emptyState}>
@@ -266,7 +267,7 @@ function ProfileCard({ profile }) {
       <View style={styles.cardInfo}>
         <View style={styles.nameRow}>
           <Text style={styles.name}>{profile.name}, {profile.age}</Text>
-          {profile.age_verified && <Text style={styles.badge}>✓ Verified</Text>}
+          {profile.age_verified && <Text style={styles.verifiedBadge}>✓ Verified</Text>}
         </View>
         <Text style={styles.bio}>{profile.bio}</Text>
         <View style={styles.interestsWrap}>
@@ -282,62 +283,62 @@ function ProfileCard({ profile }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F0', paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
-  header: { fontSize: 22, fontWeight: '700', color: '#E8603A', textAlign: 'center' },
+  header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center' },
   headerSpacer: { width: 80, alignItems: 'flex-end' },
-  signOutText: { fontSize: 12, color: '#B87A68', textAlign: 'right' },
-  verifiedText: { fontSize: 11, color: '#3DBE6B', fontWeight: '700', marginTop: 4 },
-  verifyLinkText: { fontSize: 11, color: '#E8603A', fontWeight: '700', marginTop: 4 },
+  signOutText: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.textSecondary, textAlign: 'right' },
+  verifiedText: { fontFamily: FONTS.bold, fontSize: 11, color: COLORS.success, marginTop: 4 },
+  verifyLinkText: { fontFamily: FONTS.bold, fontSize: 11, color: COLORS.coral, marginTop: 4 },
   cardArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   card: {
     position: 'absolute', width: SCREEN_WIDTH - 40, height: '90%',
-    backgroundColor: '#FFFFFF', borderRadius: 24, overflow: 'hidden',
-    shadowColor: '#3D1A0E', shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 6,
+    backgroundColor: COLORS.card, borderRadius: 24, overflow: 'hidden',
+    shadowColor: COLORS.textPrimary, shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 6,
   },
   cardBehind: { transform: [{ scale: 0.96 }], top: 8 },
-  photoPlaceholder: { flex: 1.2, backgroundColor: '#FDDDD4', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  photoPlaceholder: { flex: 1.2, backgroundColor: COLORS.coralLight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   photoEmoji: { fontSize: 96 },
   photoImage: { width: '100%', height: '100%' },
   cardInfo: { padding: 18 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { fontSize: 22, fontWeight: '700', color: '#3D1A0E' },
-  badge: {
-    fontSize: 11, fontWeight: '700', color: '#3DBE6B', backgroundColor: '#E7F7EC',
+  name: { fontFamily: FONTS.bold, fontSize: 22, color: COLORS.textPrimary },
+  verifiedBadge: {
+    fontFamily: FONTS.bold, fontSize: 11, color: COLORS.success, backgroundColor: COLORS.successLight,
     borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
   },
-  bio: { fontSize: 14, color: '#8C4A35', marginTop: 6, marginBottom: 10 },
+  bio: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, marginTop: 6, marginBottom: 10 },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { backgroundColor: '#FEF0EA', borderRadius: 16, paddingVertical: 5, paddingHorizontal: 10, borderWidth: 1, borderColor: '#F5C4B0' },
-  chipText: { fontSize: 12, color: '#8C4A35' },
+  chip: { backgroundColor: COLORS.tealLight, borderRadius: 16, paddingVertical: 5, paddingHorizontal: 10, borderWidth: 1, borderColor: COLORS.tealBorder },
+  chipText: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.teal },
   badge: {
     position: 'absolute', top: 30, zIndex: 10, borderWidth: 4, borderRadius: 8,
     paddingVertical: 4, paddingHorizontal: 12,
   },
-  likeBadge: { left: 20, borderColor: '#3DBE6B', transform: [{ rotate: '-20deg' }] },
-  nopeBadge: { right: 20, borderColor: '#E8603A', transform: [{ rotate: '20deg' }] },
+  likeBadge: { left: 20, borderColor: COLORS.success, transform: [{ rotate: '-20deg' }] },
+  nopeBadge: { right: 20, borderColor: COLORS.coral, transform: [{ rotate: '20deg' }] },
   safetyBtn: {
     position: 'absolute', top: 16, right: 16, zIndex: 20,
     width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center', justifyContent: 'center',
   },
-  safetyBtnText: { color: '#fff', fontSize: 18, fontWeight: '700', marginTop: -8 },
-  badgeText: { fontSize: 28, fontWeight: '800', color: '#3D1A0E' },
+  safetyBtnText: { color: COLORS.white, fontSize: 18, fontFamily: FONTS.bold, marginTop: -8 },
+  badgeText: { fontFamily: FONTS.bold, fontSize: 26, color: COLORS.textPrimary },
   emptyState: { alignItems: 'center', padding: 32 },
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#3D1A0E', marginBottom: 6 },
-  emptySubtext: { fontSize: 14, color: '#B87A68' },
+  emptyText: { fontFamily: FONTS.bold, fontSize: 18, color: COLORS.textPrimary, marginBottom: 6 },
+  emptySubtext: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary },
   actions: { flexDirection: 'row', justifyContent: 'center', gap: 28, paddingVertical: 24 },
   actionBtnNope: {
-    width: 60, height: 60, borderRadius: 30, backgroundColor: '#FFFFFF',
-    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#F5C4B0',
-    shadowColor: '#3D1A0E', shadowOpacity: 0.1, shadowRadius: 6, elevation: 3,
+    width: 60, height: 60, borderRadius: 30, backgroundColor: COLORS.white,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: COLORS.coralBorder,
+    shadowColor: COLORS.textPrimary, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3,
   },
   actionBtnLike: {
-    width: 60, height: 60, borderRadius: 30, backgroundColor: '#E8603A',
+    width: 60, height: 60, borderRadius: 30, backgroundColor: COLORS.coral,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#E8603A', shadowOpacity: 0.3, shadowRadius: 6, elevation: 3,
+    shadowColor: COLORS.coral, shadowOpacity: 0.3, shadowRadius: 6, elevation: 3,
   },
-  actionIconNope: { fontSize: 26, color: '#E8603A', fontWeight: '700' },
-  actionIconLike: { fontSize: 26, color: '#fff' },
+  actionIconNope: { fontSize: 26, color: COLORS.coral, fontFamily: FONTS.bold },
+  actionIconLike: { fontSize: 26, color: COLORS.white },
 });

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
+import { COLORS, FONTS } from '../../theme/theme';
 
 const INTEREST_OPTIONS = [
   'Travel', 'Music', 'Movies', 'Foodie', 'Fitness', 'Art',
@@ -141,11 +142,11 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
 
         <TextInput
           style={styles.input} placeholder="Your Name"
-          placeholderTextColor="#B87A68" value={name} onChangeText={setName}
+          placeholderTextColor={COLORS.textSecondary} value={name} onChangeText={setName}
         />
         <TextInput
           style={styles.input} placeholder="Age"
-          placeholderTextColor="#B87A68" value={age} onChangeText={setAge}
+          placeholderTextColor={COLORS.textSecondary} value={age} onChangeText={setAge}
           keyboardType="number-pad" maxLength={3}
         />
 
@@ -164,7 +165,7 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
 
         <TextInput
           style={[styles.input, styles.bioInput]} placeholder="A little about you..."
-          placeholderTextColor="#B87A68" value={bio} onChangeText={setBio}
+          placeholderTextColor={COLORS.textSecondary} value={bio} onChangeText={setBio}
           multiline numberOfLines={3}
         />
 
@@ -182,7 +183,7 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
         </View>
 
         <TouchableOpacity style={styles.btn} onPress={handleContinue} disabled={saving}>
-          {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Continue</Text>}
+          {saving ? <ActivityIndicator color={COLORS.white} /> : <Text style={styles.btnText}>Continue</Text>}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -190,52 +191,52 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F0' },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   scroll: { flexGrow: 1, padding: 24, paddingTop: 60, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: '700', color: '#3D1A0E', textAlign: 'center', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#B87A68', textAlign: 'center', marginBottom: 24, fontStyle: 'italic' },
-  label: { fontSize: 14, fontWeight: '600', color: '#8C4A35', marginBottom: 10, marginTop: 4 },
+  title: { fontFamily: FONTS.bold, fontSize: 24, color: COLORS.textPrimary, textAlign: 'center', marginBottom: 4 },
+  subtitle: { fontFamily: FONTS.medium, fontSize: 14, color: COLORS.teal, textAlign: 'center', marginBottom: 24 },
+  label: { fontFamily: FONTS.bold, fontSize: 14, color: COLORS.teal, marginBottom: 10, marginTop: 4 },
   photoSection: { alignItems: 'center', marginBottom: 20 },
   photoPreview: {
-    width: 110, height: 110, borderRadius: 55, backgroundColor: '#FEF0EA',
-    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#F5C4B0',
+    width: 110, height: 110, borderRadius: 55, backgroundColor: COLORS.inputBg,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: COLORS.coralBorder,
     overflow: 'hidden', marginBottom: 10,
   },
   photoImage: { width: 110, height: 110 },
   photoPreviewEmoji: { fontSize: 52 },
   photoBtn: {
-    borderWidth: 1.5, borderColor: '#E8603A', borderRadius: 20,
+    borderWidth: 1.5, borderColor: COLORS.teal, borderRadius: 20,
     paddingVertical: 8, paddingHorizontal: 18,
   },
-  photoBtnText: { color: '#E8603A', fontSize: 13, fontWeight: '700' },
+  photoBtnText: { fontFamily: FONTS.bold, color: COLORS.teal, fontSize: 13 },
   avatarRow: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' },
   avatarBtn: {
-    width: 52, height: 52, borderRadius: 26, backgroundColor: '#FEF0EA',
-    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#F5C4B0',
+    width: 52, height: 52, borderRadius: 26, backgroundColor: COLORS.inputBg,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: COLORS.coralBorder,
   },
-  avatarBtnActive: { borderColor: '#E8603A', backgroundColor: '#FDDDD4' },
+  avatarBtnActive: { borderColor: COLORS.coral, backgroundColor: COLORS.coralLight },
   avatarEmoji: { fontSize: 26 },
   input: {
-    backgroundColor: '#FEF0EA', borderWidth: 1.5, borderColor: '#F5C4B0',
-    borderRadius: 12, padding: 14, fontSize: 14, color: '#3D1A0E', marginBottom: 12,
+    backgroundColor: COLORS.inputBg, borderWidth: 1.5, borderColor: COLORS.coralBorder,
+    borderRadius: 14, padding: 14, fontSize: 14, fontFamily: FONTS.medium, color: COLORS.textPrimary, marginBottom: 12,
   },
   genderRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
   genderBtn: {
-    flex: 1, borderWidth: 1.5, borderColor: '#F5C4B0',
-    borderRadius: 12, padding: 10, alignItems: 'center', backgroundColor: '#FFFFFF',
+    flex: 1, borderWidth: 1.5, borderColor: COLORS.coralBorder,
+    borderRadius: 14, padding: 10, alignItems: 'center', backgroundColor: COLORS.white,
   },
-  genderBtnActive: { backgroundColor: '#FDDDD4', borderColor: '#E8603A' },
-  genderText: { fontSize: 13, color: '#8C4A35' },
-  genderTextActive: { color: '#E8603A', fontWeight: '600' },
+  genderBtnActive: { backgroundColor: COLORS.coralLight, borderColor: COLORS.coral },
+  genderText: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.textSecondary },
+  genderTextActive: { fontFamily: FONTS.bold, color: COLORS.coral },
   bioInput: { height: 90, textAlignVertical: 'top' },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 28 },
   chip: {
-    borderWidth: 1.5, borderColor: '#F5C4B0', borderRadius: 20,
-    paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#FFFFFF',
+    borderWidth: 1.5, borderColor: COLORS.tealBorder, borderRadius: 20,
+    paddingVertical: 8, paddingHorizontal: 14, backgroundColor: COLORS.white,
   },
-  chipActive: { backgroundColor: '#E8603A', borderColor: '#E8603A' },
-  chipText: { fontSize: 13, color: '#8C4A35' },
-  chipTextActive: { color: '#fff', fontWeight: '600' },
-  btn: { backgroundColor: '#E8603A', borderRadius: 14, padding: 16, alignItems: 'center', minHeight: 52, justifyContent: 'center' },
-  btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  chipActive: { backgroundColor: COLORS.teal, borderColor: COLORS.teal },
+  chipText: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.textSecondary },
+  chipTextActive: { fontFamily: FONTS.bold, color: COLORS.white },
+  btn: { backgroundColor: COLORS.coral, borderRadius: 16, padding: 16, alignItems: 'center', minHeight: 52, justifyContent: 'center' },
+  btnText: { fontFamily: FONTS.bold, color: COLORS.white, fontSize: 16 },
 });

@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
+import { COLORS, FONTS } from '../../theme/theme';
 
 export default function VerifyAgeScreen({ onDone }) {
   const [photo, setPhoto] = useState(null);
@@ -83,7 +84,7 @@ export default function VerifyAgeScreen({ onDone }) {
 
       {photo && (
         <TouchableOpacity style={styles.primaryBtn} onPress={handleSubmit} disabled={submitting}>
-          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Verify</Text>}
+          {submitting ? <ActivityIndicator color={COLORS.white} /> : <Text style={styles.primaryBtnText}>Verify</Text>}
         </TouchableOpacity>
       )}
     </View>
@@ -91,26 +92,26 @@ export default function VerifyAgeScreen({ onDone }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF5F0', paddingTop: 60, paddingHorizontal: 24 },
+  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60, paddingHorizontal: 24 },
   backBtn: { marginBottom: 20 },
-  backText: { fontSize: 16, color: '#E8603A', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '700', color: '#3D1A0E', textAlign: 'center', marginBottom: 8 },
-  subtitle: { fontSize: 14, color: '#B87A68', textAlign: 'center', marginBottom: 32, lineHeight: 20 },
+  backText: { fontFamily: FONTS.bold, fontSize: 16, color: COLORS.coral },
+  title: { fontFamily: FONTS.bold, fontSize: 24, color: COLORS.textPrimary, textAlign: 'center', marginBottom: 8 },
+  subtitle: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', marginBottom: 32, lineHeight: 20 },
   photoArea: { alignItems: 'center', marginBottom: 32 },
-  photoPreview: { width: 220, height: 220, borderRadius: 110, borderWidth: 3, borderColor: '#E8603A' },
+  photoPreview: { width: 220, height: 220, borderRadius: 110, borderWidth: 3, borderColor: COLORS.coral },
   photoPlaceholder: {
-    width: 220, height: 220, borderRadius: 110, backgroundColor: '#FEF0EA',
-    borderWidth: 2, borderColor: '#F5C4B0', alignItems: 'center', justifyContent: 'center',
+    width: 220, height: 220, borderRadius: 110, backgroundColor: COLORS.inputBg,
+    borderWidth: 2, borderColor: COLORS.coralBorder, alignItems: 'center', justifyContent: 'center',
   },
   photoPlaceholderEmoji: { fontSize: 72 },
   secondaryBtn: {
-    borderWidth: 1.5, borderColor: '#E8603A', borderRadius: 14, padding: 16,
+    borderWidth: 1.5, borderColor: COLORS.teal, borderRadius: 16, padding: 16,
     alignItems: 'center', marginBottom: 12,
   },
-  secondaryBtnText: { color: '#E8603A', fontSize: 16, fontWeight: '700' },
+  secondaryBtnText: { fontFamily: FONTS.bold, color: COLORS.teal, fontSize: 16 },
   primaryBtn: {
-    backgroundColor: '#E8603A', borderRadius: 14, padding: 16,
+    backgroundColor: COLORS.coral, borderRadius: 16, padding: 16,
     alignItems: 'center', minHeight: 54, justifyContent: 'center',
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  primaryBtnText: { fontFamily: FONTS.bold, color: COLORS.white, fontSize: 16 },
 });

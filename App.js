@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { useFonts } from 'expo-font';
+import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
+import { Quicksand_400Regular, Quicksand_500Medium, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import { supabase } from './src/lib/supabase';
 import { AGE_ATTESTATION_TEXT } from './src/lib/legal';
+import { COLORS, FONTS } from './src/theme/theme';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
 import SwipeScreen from './src/screens/swipe/SwipeScreen';
@@ -17,6 +21,12 @@ const TABS = [
 ];
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Pacifico_400Regular,
+    Quicksand_400Regular,
+    Quicksand_500Medium,
+    Quicksand_700Bold,
+  });
   const [session, setSession] = useState(undefined);
   const [profile, setProfile] = useState(undefined);
   const [splashScreen, setSplashScreen] = useState('splash');
@@ -97,11 +107,11 @@ export default function App() {
     if (data) setProfile(data);
   };
 
-  if (session === undefined || (session && profile === undefined)) {
+  if (!fontsLoaded || session === undefined || (session && profile === undefined)) {
     return (
       <View style={styles.splash}>
         <StatusBar style="auto" />
-        <ActivityIndicator size="large" color="#E8603A" />
+        <ActivityIndicator size="large" color={COLORS.coral} />
       </View>
     );
   }
@@ -113,7 +123,7 @@ export default function App() {
     return (
       <View style={styles.splash}>
         <StatusBar style="auto" />
-        <Text style={styles.logo}>🌸 NearMatch</Text>
+        <Text style={styles.logo}>NearMatch</Text>
         <Text style={styles.tagline}>Warm connections, just around the corner</Text>
         <TouchableOpacity style={styles.btnPrimary} onPress={() => { setAuthMode('signup'); setSplashScreen('auth'); }}>
           <Text style={styles.btnPrimaryText}>Create Account</Text>
@@ -176,25 +186,25 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  splash: { flex: 1, backgroundColor: '#FFF5F0', alignItems: 'center', justifyContent: 'center', padding: 32 },
-  logo: { fontSize: 36, fontWeight: '800', color: '#E8603A', textAlign: 'center', marginBottom: 6 },
-  tagline: { fontSize: 16, color: '#8C4A35', textAlign: 'center', marginBottom: 60, fontStyle: 'italic', lineHeight: 24 },
-  btnPrimary: { width: '100%', backgroundColor: '#E8603A', borderRadius: 14, padding: 16, alignItems: 'center', marginBottom: 12 },
-  btnPrimaryText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  btnSecondary: { width: '100%', backgroundColor: '#FFFFFF', borderRadius: 14, padding: 16, alignItems: 'center', borderWidth: 1.5, borderColor: '#F5C4B0', marginBottom: 32 },
-  btnSecondaryText: { color: '#8C4A35', fontSize: 16, fontWeight: '600' },
-  terms: { fontSize: 12, color: '#D4A898', textAlign: 'center' },
-  mainContainer: { flex: 1, backgroundColor: '#FFF5F0' },
+  splash: { flex: 1, backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center', padding: 32 },
+  logo: { fontFamily: FONTS.logo, fontSize: 42, color: COLORS.coral, textAlign: 'center', marginBottom: 10 },
+  tagline: { fontFamily: FONTS.medium, fontSize: 16, color: COLORS.teal, textAlign: 'center', marginBottom: 60, lineHeight: 24 },
+  btnPrimary: { width: '100%', backgroundColor: COLORS.coral, borderRadius: 16, padding: 16, alignItems: 'center', marginBottom: 12 },
+  btnPrimaryText: { fontFamily: FONTS.bold, color: COLORS.white, fontSize: 16 },
+  btnSecondary: { width: '100%', backgroundColor: COLORS.teal, borderRadius: 16, padding: 16, alignItems: 'center', marginBottom: 32 },
+  btnSecondaryText: { fontFamily: FONTS.bold, color: COLORS.white, fontSize: 16 },
+  terms: { fontFamily: FONTS.regular, fontSize: 12, color: COLORS.textSecondary, textAlign: 'center' },
+  mainContainer: { flex: 1, backgroundColor: COLORS.bg },
   tabContent: { flex: 1 },
   tabPane: { flex: 1 },
   tabPaneHidden: { display: 'none' },
   tabBar: {
-    flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#F5C4B0',
-    backgroundColor: '#FFFFFF', paddingBottom: 22, paddingTop: 10,
+    flexDirection: 'row', borderTopWidth: 1, borderTopColor: COLORS.coralBorder,
+    backgroundColor: COLORS.card, paddingBottom: 22, paddingTop: 10,
   },
   tabBtn: { flex: 1, alignItems: 'center' },
   tabIcon: { fontSize: 20, opacity: 0.4 },
   tabIconActive: { opacity: 1 },
-  tabLabel: { fontSize: 11, color: '#B87A68', marginTop: 2 },
-  tabLabelActive: { color: '#E8603A', fontWeight: '700' },
+  tabLabel: { fontFamily: FONTS.medium, fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
+  tabLabelActive: { fontFamily: FONTS.bold, color: COLORS.coral },
 });
