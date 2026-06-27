@@ -17,6 +17,7 @@
       "bundleIdentifier": "com.kumravi253.nearmatch"
     },
     "android": {
+      "package": "com.kumravi253.nearmatch",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
