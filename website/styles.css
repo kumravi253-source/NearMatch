@@ -325,7 +325,23 @@ section { padding: 80px 0; }
 .coming-soon-pill {
   display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.16);
   border: 1px solid rgba(255,255,255,0.35); border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 700;
+  margin-top: 20px;
 }
+.waitlist-form {
+  display: flex; gap: 10px; max-width: 420px; margin: 0 auto; flex-wrap: wrap;
+}
+.waitlist-form input[type="email"] {
+  flex: 1; min-width: 200px; padding: 14px 18px; border-radius: 14px; border: none;
+  font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--text-primary);
+}
+.waitlist-form button {
+  background: var(--white); color: var(--coral); border: none; border-radius: 14px;
+  padding: 14px 22px; font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer;
+}
+.waitlist-form button:disabled { opacity: 0.7; cursor: default; }
+.waitlist-message { min-height: 20px; margin: 14px 0 0; font-size: 13px; font-weight: 700; }
+.waitlist-message.success { color: var(--white); }
+.waitlist-message.error { color: #FFE0D8; }
 
 footer { padding: 56px 0 32px; }
 .footer-grid { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 32px; margin-bottom: 32px; }

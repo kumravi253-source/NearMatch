@@ -287,6 +287,11 @@
     <div class="cta-banner">
       <h2>Be first in line when NearMatch launches</h2>
       <p>We're finishing up testing now. No spam, no fake countdown timers — just an honest heads-up when it's live.</p>
+      <form id="waitlist-form" class="waitlist-form">
+        <input type="email" id="waitlist-email" placeholder="you@example.com" required autocomplete="email">
+        <button type="submit" id="waitlist-submit">Join the waitlist</button>
+      </form>
+      <p id="waitlist-message" class="waitlist-message" aria-live="polite"></p>
       <span class="coming-soon-pill">📱 iOS &amp; Android — coming soon</span>
     </div>
   </div>
@@ -324,5 +329,48 @@
   </div>
 </footer>
 
+<script>
+  const SUPABASE_URL = 'https://ipwheuikchuoyskrfghi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd2hldWlrY2h1b3lza3JmZ2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0OTQ5MDgsImV4cCI6MjA5ODA3MDkwOH0.TtjuHj96qAB11ILbcLcZF8UKudzSq1XvY4Cflp1kD8o';
+
+  document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('waitlist-email');
+    const submitBtn = document.getElementById('waitlist-submit');
+    const message = document.getElementById('waitlist-message');
+    const email = emailInput.value.trim();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Joining…';
+    message.textContent = '';
+    message.className = 'waitlist-message';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok || res.status === 409) {
+        message.textContent = "You're on the list — we'll email you when NearMatch launches.";
+        message.className = 'waitlist-message success';
+        emailInput.value = '';
+      } else {
+        throw new Error('request failed');
+      }
+    } catch (err) {
+      message.textContent = 'Something went wrong. Please try again.';
+      message.className = 'waitlist-message error';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Join the waitlist';
+    }
+  });
+</script>
 </body>
 </html>
