@@ -79,6 +79,27 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
     });
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete your account?',
+      'This permanently deletes your profile, matches, and messages. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: confirmDeleteAccount },
+      ]
+    );
+  };
+
+  const confirmDeleteAccount = async () => {
+    const { error } = await supabase.functions.invoke('delete-account');
+    if (error) {
+      console.error('Failed to delete account', error);
+      Alert.alert('Error', 'Could not delete your account. Please try again.');
+      return;
+    }
+    onSignOut();
+  };
+
   const handleSafetyMenu = (targetProfile) => {
     Alert.alert(
       targetProfile.name,
@@ -192,6 +213,9 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
               <Text style={styles.verifyLinkText}>Get Verified</Text>
             </TouchableOpacity>
           )}
+          <TouchableOpacity onPress={handleDeleteAccount}>
+            <Text style={styles.deleteAccountText}>Delete Account</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -290,6 +314,7 @@ const styles = StyleSheet.create({
   signOutText: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.textSecondary, textAlign: 'right' },
   verifiedText: { fontFamily: FONTS.bold, fontSize: 11, color: COLORS.success, marginTop: 4 },
   verifyLinkText: { fontFamily: FONTS.bold, fontSize: 11, color: COLORS.coral, marginTop: 4 },
+  deleteAccountText: { fontFamily: FONTS.medium, fontSize: 9, color: COLORS.textMuted, marginTop: 6, textAlign: 'right' },
   cardArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   card: {
     position: 'absolute', width: SCREEN_WIDTH - 40, height: '90%',
