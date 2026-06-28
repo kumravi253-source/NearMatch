@@ -15,14 +15,16 @@ const INTEREST_OPTIONS = [
 const AVATAR_OPTIONS = ['🙂', '😎', '🥳', '🌸', '🌻', '🦋'];
 const GENDER_OPTIONS = ['Man', 'Woman', 'Non-binary'];
 
-export default function ProfileSetupScreen({ userId, onComplete }) {
-  const [avatar, setAvatar] = useState(AVATAR_OPTIONS[0]);
+export default function ProfileSetupScreen({ userId, onComplete, existingProfile, onCancel }) {
+  const isEditMode = !!existingProfile;
+  const [avatar, setAvatar] = useState(existingProfile?.avatar_emoji || AVATAR_OPTIONS[0]);
   const [photoUri, setPhotoUri] = useState(null);
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [bio, setBio] = useState('');
-  const [interests, setInterests] = useState([]);
+  const [existingPhotoUrl, setExistingPhotoUrl] = useState(existingProfile?.photo_url || null);
+  const [name, setName] = useState(existingProfile?.name || '');
+  const [age, setAge] = useState(existingProfile?.age ? String(existingProfile.age) : '');
+  const [gender, setGender] = useState(existingProfile?.gender || '');
+  const [bio, setBio] = useState(existingProfile?.bio || '');
+  const [interests, setInterests] = useState(existingProfile?.interests || []);
   const [saving, setSaving] = useState(false);
 
   const toggleInterest = (interest) => {
@@ -47,6 +49,7 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
     });
     if (!result.canceled && result.assets?.[0]?.uri) {
       setPhotoUri(result.assets[0].uri);
+      setExistingPhotoUrl(null);
     }
   };
 
@@ -79,7 +82,7 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
 
     setSaving(true);
     try {
-      let photoUrl = null;
+      let photoUrl = existingPhotoUrl;
       if (photoUri) {
         photoUrl = await uploadPhoto();
       }
@@ -111,19 +114,24 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Set up your profile 🌸</Text>
-        <Text style={styles.subtitle}>Let others know who you are</Text>
+        {onCancel && (
+          <TouchableOpacity onPress={onCancel} style={styles.backBtn}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
+        )}
+        <Text style={styles.title}>{isEditMode ? 'Edit your profile 🌸' : 'Set up your profile 🌸'}</Text>
+        <Text style={styles.subtitle}>{isEditMode ? 'Update your info anytime' : 'Let others know who you are'}</Text>
 
         <View style={styles.photoSection}>
           <TouchableOpacity style={styles.photoPreview} onPress={handlePickPhoto}>
-            {photoUri ? (
-              <Image source={{ uri: photoUri }} style={styles.photoImage} />
+            {photoUri || existingPhotoUrl ? (
+              <Image source={{ uri: photoUri || existingPhotoUrl }} style={styles.photoImage} />
             ) : (
               <Text style={styles.photoPreviewEmoji}>{avatar}</Text>
             )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.photoBtn} onPress={handlePickPhoto}>
-            <Text style={styles.photoBtnText}>{photoUri ? 'Change Photo' : 'Add Photo'}</Text>
+            <Text style={styles.photoBtnText}>{photoUri || existingPhotoUrl ? 'Change Photo' : 'Add Photo'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -132,8 +140,8 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
           {AVATAR_OPTIONS.map((a) => (
             <TouchableOpacity
               key={a}
-              style={[styles.avatarBtn, !photoUri && avatar === a && styles.avatarBtnActive]}
-              onPress={() => { setAvatar(a); setPhotoUri(null); }}
+              style={[styles.avatarBtn, !photoUri && !existingPhotoUrl && avatar === a && styles.avatarBtnActive]}
+              onPress={() => { setAvatar(a); setPhotoUri(null); setExistingPhotoUrl(null); }}
             >
               <Text style={styles.avatarEmoji}>{a}</Text>
             </TouchableOpacity>
@@ -183,7 +191,7 @@ export default function ProfileSetupScreen({ userId, onComplete }) {
         </View>
 
         <TouchableOpacity style={styles.btn} onPress={handleContinue} disabled={saving}>
-          {saving ? <ActivityIndicator color={COLORS.white} /> : <Text style={styles.btnText}>Continue</Text>}
+          {saving ? <ActivityIndicator color={COLORS.white} /> : <Text style={styles.btnText}>{isEditMode ? 'Save Changes' : 'Continue'}</Text>}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -239,4 +247,6 @@ const styles = StyleSheet.create({
   chipTextActive: { fontFamily: FONTS.bold, color: COLORS.white },
   btn: { backgroundColor: COLORS.coral, borderRadius: 16, padding: 16, alignItems: 'center', minHeight: 52, justifyContent: 'center' },
   btnText: { fontFamily: FONTS.bold, color: COLORS.white, fontSize: 16 },
+  backBtn: { marginBottom: 16 },
+  backText: { fontFamily: FONTS.bold, fontSize: 16, color: COLORS.coral },
 });

@@ -9,7 +9,7 @@ import { COLORS, FONTS } from '../../theme/theme';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
 
-export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge }) {
+export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge, onEditProfile }) {
   const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -77,6 +77,19 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
         Alert.alert("It's a match! 🎉", `You and ${profile.name} liked each other.`);
       }
     });
+  };
+
+  const handleAccountMenu = () => {
+    Alert.alert(
+      'Account',
+      'What would you like to do?',
+      [
+        { text: 'Edit Profile', onPress: onEditProfile },
+        { text: 'Sign Out', onPress: onSignOut },
+        { text: 'Delete Account', style: 'destructive', onPress: handleDeleteAccount },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
   };
 
   const handleDeleteAccount = () => {
@@ -203,8 +216,8 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
         <View style={styles.headerSpacer} />
         <Text style={styles.header}>Discover 🌸</Text>
         <View style={styles.headerSpacer}>
-          <TouchableOpacity onPress={onSignOut}>
-            <Text style={styles.signOutText}>Sign Out</Text>
+          <TouchableOpacity onPress={handleAccountMenu}>
+            <Text style={styles.accountMenuText}>Account ⋯</Text>
           </TouchableOpacity>
           {isAgeVerified ? (
             <Text style={styles.verifiedText}>✓ Verified</Text>
@@ -213,9 +226,6 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
               <Text style={styles.verifyLinkText}>Get Verified</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity onPress={handleDeleteAccount}>
-            <Text style={styles.deleteAccountText}>Delete Account</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -311,10 +321,9 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center' },
   headerSpacer: { width: 80, alignItems: 'flex-end' },
-  signOutText: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.textSecondary, textAlign: 'right' },
+  accountMenuText: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.textSecondary, textAlign: 'right' },
   verifiedText: { fontFamily: FONTS.bold, fontSize: 11, color: COLORS.success, marginTop: 4 },
   verifyLinkText: { fontFamily: FONTS.bold, fontSize: 11, color: COLORS.coral, marginTop: 4 },
-  deleteAccountText: { fontFamily: FONTS.medium, fontSize: 9, color: COLORS.textMuted, marginTop: 6, textAlign: 'right' },
   cardArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   card: {
     position: 'absolute', width: SCREEN_WIDTH - 40, height: '90%',

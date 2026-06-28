@@ -34,6 +34,7 @@ export default function App() {
   const [tab, setTab] = useState('swipe');
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [showVerifyAge, setShowVerifyAge] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session ?? null));
@@ -90,6 +91,7 @@ export default function App() {
 
   const handleProfileComplete = (savedProfile) => {
     setProfile(savedProfile);
+    setEditingProfile(false);
   };
 
   const handleOpenChat = (matchId) => {
@@ -144,6 +146,17 @@ export default function App() {
     return <VerifyAgeScreen onDone={handleVerifyAgeDone} />;
   }
 
+  if (editingProfile) {
+    return (
+      <ProfileSetupScreen
+        userId={session.user.id}
+        existingProfile={profile}
+        onComplete={handleProfileComplete}
+        onCancel={() => setEditingProfile(false)}
+      />
+    );
+  }
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar style="auto" />
@@ -154,6 +167,7 @@ export default function App() {
             onSignOut={handleSignOut}
             isAgeVerified={profile.age_verified}
             onVerifyAge={() => setShowVerifyAge(true)}
+            onEditProfile={() => setEditingProfile(true)}
           />
         </View>
         <View style={tab === 'matches' ? styles.tabPane : styles.tabPaneHidden}>
