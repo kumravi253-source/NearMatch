@@ -1,5 +1,3 @@
-import { withSupabase } from "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
 const RAZORPAY_KEY_ID     = Deno.env.get("RAZORPAY_KEY_ID");
 const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET");
 
