@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — NearMatch</title>
+<meta name="description" content="Simple, transparent pricing. Go Premium for unlimited likes, see who liked you, and priority discovery. Refer friends and earn ₹100 wallet credit each.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .pricing-hero {
+    background: var(--bg);
+    padding: 80px 0 48px;
+    text-align: center;
+  }
+  .pricing-hero h1 { margin-bottom: 12px; }
+  .pricing-hero p { color: var(--text-secondary); max-width: 480px; margin: 0 auto; }
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 860px;
+    margin: 48px auto 0;
+  }
+
+  .plan-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 32px 28px;
+    border: 2px solid var(--coral-border);
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .plan-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(232,96,58,0.12); }
+  .plan-card.featured {
+    border-color: var(--coral);
+    box-shadow: 0 8px 28px rgba(232,96,58,0.18);
+  }
+  .plan-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--coral);
+    color: white;
+    font-family: var(--font-bold);
+    font-size: 12px;
+    padding: 4px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .plan-name {
+    font-family: var(--font-bold);
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .plan-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+  .plan-price {
+    font-family: var(--font-bold);
+    font-size: 42px;
+    color: var(--coral);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .plan-price span {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-family: var(--font-medium);
+  }
+  .plan-per {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+  .plan-savings {
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    font-family: var(--font-bold);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px;
+  }
+  .plan-features li {
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 7px 0;
+    border-bottom: 1px solid var(--coral-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .plan-features li:last-child { border-bottom: none; }
+  .plan-features li .check { color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .plan-features li .cross { color: var(--text-muted); flex-shrink: 0; }
+
+  .btn-plan {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    font-family: var(--font-bold);
+    font-size: 15px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-plan:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-plan:active { transform: translateY(0); }
+  .btn-plan-primary { background: var(--coral); color: white; }
+  .btn-plan-outline { background: transparent; color: var(--coral); border: 2px solid var(--coral); }
+  .btn-plan:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Refer & Earn */
+  .refer-section {
+    background: linear-gradient(135deg, var(--coral-light) 0%, var(--teal-light) 100%);
+    border-radius: 28px;
+    padding: 56px 40px;
+    text-align: center;
+    max-width: 860px;
+    margin: 64px auto;
+  }
+  .refer-section h2 { margin-bottom: 10px; }
+  .refer-section .lead { color: var(--text-secondary); margin-bottom: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
+  .refer-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+  .refer-step {
+    background: white;
+    border-radius: 18px;
+    padding: 24px 18px;
+    box-shadow: 0 4px 16px rgba(61,140,122,0.10);
+  }
+  .refer-step-icon { font-size: 32px; margin-bottom: 12px; }
+  .refer-step h4 { font-family: var(--font-bold); font-size: 15px; color: var(--text-primary); margin-bottom: 6px; }
+  .refer-step p { font-size: 13px; color: var(--text-secondary); }
+  .refer-reward-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--coral);
+    color: white;
+    font-family: var(--font-bold);
+    font-size: 18px;
+    padding: 14px 32px;
+    border-radius: 50px;
+    margin-bottom: 14px;
+  }
+  .refer-note { font-size: 13px; color: var(--text-secondary); }
+
+  /* Comparison table */
+  .compare-section { padding: 64px 0; }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .compare-table th {
+    font-family: var(--font-bold);
+    padding: 14px 20px;
+    text-align: center;
+    background: var(--coral-light);
+    color: var(--text-primary);
+  }
+  .compare-table th:first-child { text-align: left; background: transparent; }
+  .compare-table td {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--coral-border);
+    text-align: center;
+    color: var(--text-primary);
+  }
+  .compare-table td:first-child { text-align: left; font-family: var(--font-medium); }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .yes { color: var(--teal); font-weight: 700; }
+  .compare-table .no { color: var(--text-muted); }
+  .compare-table th.highlight { background: var(--coral); color: white; border-radius: 12px 12px 0 0; }
+
+  /* Payment modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(61,40,23,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 24px;
+    padding: 36px 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal h3 { font-family: var(--font-bold); font-size: 20px; color: var(--text-primary); margin-bottom: 6px; }
+  .modal p { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+  .modal-price { font-family: var(--font-bold); font-size: 32px; color: var(--coral); margin-bottom: 20px; }
+  .modal-input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--coral-border);
+    border-radius: 12px;
+    font-family: var(--font-medium);
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--input-bg);
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .modal-input:focus { border-color: var(--coral); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+  .modal-cancel {
+    flex: 1; padding: 13px; border-radius: 12px; border: 2px solid var(--coral-border);
+    background: transparent; font-family: var(--font-bold); font-size: 14px;
+    color: var(--text-secondary); cursor: pointer;
+  }
+  .modal-pay {
+    flex: 2; padding: 13px; border-radius: 12px; border: none;
+    background: var(--coral); font-family: var(--font-bold); font-size: 14px;
+    color: white; cursor: pointer;
+  }
+  .modal-pay:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .coming-soon-note {
+    background: var(--teal-light);
+    border: 1.5px solid var(--teal-border);
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: var(--teal-dark);
+    font-family: var(--font-medium);
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .refer-section { padding: 36px 20px; }
+    .modal { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">NearMatch</a>
+    <div class="nav-links">
+      <a href="index.html#features">Features</a>
+      <a href="index.html#safety">Trust &amp; Safety</a>
+      <a href="pricing.html" style="color:var(--coral); font-weight:700;">Pricing</a>
+      <a href="support.html">Support</a>
+      <a href="index.html#download" class="nav-cta">Get Notified</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="pricing-hero">
+  <div class="container">
+    <span class="eyebrow">Simple pricing</span>
+    <h1>Find love without <span class="accent">limits</span></h1>
+    <p>Start free. Upgrade when you're ready. No hidden fees, no dark patterns.</p>
+  </div>
+</section>
+
+<!-- Plans -->
+<section style="padding: 0 0 64px;">
+  <div class="container">
+    <div class="plans-grid">
+
+      <!-- Free -->
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-desc">Everything you need to get started</div>
+        <div class="plan-price">₹0</div>
+        <div class="plan-per">forever free</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 10 likes per day</li>
+          <li><span class="check">✓</span> Real-time chat with matches</li>
+          <li><span class="check">✓</span> AI age verification badge</li>
+          <li><span class="check">✓</span> Block &amp; report</li>
+          <li><span class="cross">✕</span> <span style="color:var(--text-muted)">See who liked you</span></li>
+          <li><span class="cross">✕</span> <span style="color:var(--text-muted)">Unlimited likes</span></li>
+          <li><span class="cross">✕</span> <span style="color:var(--text-muted)">Priority in discovery</span></li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="openModal('free')">Get Started Free</button>
+        <div class="coming-soon-note">🚀 Available at app launch</div>
+      </div>
+
+      <!-- Premium Monthly -->
+      <div class="plan-card featured">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-desc">The full NearMatch experience</div>
+        <div class="plan-price">₹299 <span>/ mo</span></div>
+        <div class="plan-per">billed monthly</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Unlimited likes</li>
+          <li><span class="check">✓</span> See who liked you</li>
+          <li><span class="check">✓</span> Priority in discovery feed</li>
+          <li><span class="check">✓</span> Real-time chat with matches</li>
+          <li><span class="check">✓</span> AI age verification badge</li>
+          <li><span class="check">✓</span> Block &amp; report</li>
+          <li><span class="check">✓</span> Cancel anytime</li>
+        </ul>
+        <button class="btn-plan btn-plan-primary" onclick="openModal('monthly')">Subscribe — ₹299/mo</button>
+        <div class="coming-soon-note">🚀 Available at app launch</div>
+      </div>
+
+      <!-- Premium 3-Month -->
+      <div class="plan-card">
+        <div class="plan-name">Premium 3-Month</div>
+        <div class="plan-desc">Best value for serious daters</div>
+        <div class="plan-price">₹499 <span>/ 3 mo</span></div>
+        <div class="plan-per">one-time payment</div>
+        <div class="plan-savings">Save ₹398 vs monthly</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Everything in Premium</li>
+          <li><span class="check">✓</span> 3 full months of access</li>
+          <li><span class="check">✓</span> Best per-month value (₹166/mo)</li>
+          <li><span class="check">✓</span> Priority support</li>
+        </ul>
+        <button class="btn-plan btn-plan-primary" onclick="openModal('quarterly')">Get 3 Months — ₹499</button>
+        <div class="coming-soon-note">🚀 Available at app launch</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Feature comparison table -->
+<section class="compare-section section-alt">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Compare plans</span>
+      <h2>What's included</h2>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Free</th>
+            <th class="highlight">Premium Monthly</th>
+            <th>Premium 3-Month</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Daily likes</td><td>10</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+          <tr><td>Real-time chat</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>AI age verification</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>Block &amp; report</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>See who liked you</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>Priority in discovery</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>Priority support</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+          <tr>
+            <td>Price</td>
+            <td>Free</td>
+            <td class="yes">₹299/month</td>
+            <td class="yes">₹499 for 3 months</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Refer & Earn -->
+<section style="padding: 0 0 80px;">
+  <div class="container">
+    <div class="refer-section">
+      <span class="eyebrow">Refer &amp; Earn</span>
+      <h2>Share NearMatch, earn <span class="accent">₹100</span></h2>
+      <p class="lead">Every friend you invite who signs up adds ₹100 to your NearMatch wallet — use it toward your Premium subscription.</p>
+
+      <div class="refer-steps">
+        <div class="refer-step">
+          <div class="refer-step-icon">🔗</div>
+          <h4>Share your link</h4>
+          <p>Get your unique referral link from the app after signing up.</p>
+        </div>
+        <div class="refer-step">
+          <div class="refer-step-icon">👥</div>
+          <h4>Friend signs up</h4>
+          <p>Your friend downloads NearMatch and creates an account using your link.</p>
+        </div>
+        <div class="refer-step">
+          <div class="refer-step-icon">💰</div>
+          <h4>Earn ₹100</h4>
+          <p>₹100 is credited to your NearMatch wallet automatically — no cap on referrals.</p>
+        </div>
+      </div>
+
+      <div class="refer-reward-pill">
+        💸 ₹100 per successful referral
+      </div>
+      <div class="refer-note">No limit on how many friends you can refer. Wallet credits apply to Premium subscriptions only.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-alt" style="padding: 64px 0;">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Questions</span>
+      <h2>Frequently asked</h2>
+    </div>
+    <div style="max-width:680px; margin:0 auto;">
+      <div class="card" style="margin-bottom:16px;">
+        <h4 style="margin-bottom:8px;">When will Premium be available?</h4>
+        <p style="color:var(--text-secondary); font-size:14px;">NearMatch is currently in final testing. Premium subscriptions go live the moment the app launches on iOS and Android. Join the waitlist to be first to know.</p>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <h4 style="margin-bottom:8px;">Can I cancel my subscription anytime?</h4>
+        <p style="color:var(--text-secondary); font-size:14px;">Yes — monthly subscriptions can be cancelled at any time. Your Premium access continues until the end of the billing period.</p>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <h4 style="margin-bottom:8px;">How does the referral wallet work?</h4>
+        <p style="color:var(--text-secondary); font-size:14px;">Every verified signup through your referral link adds ₹100 to your NearMatch wallet. Wallet credits can be used to pay for or extend your Premium subscription — there's no expiry and no cap.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:8px;">Is my payment secure?</h4>
+        <p style="color:var(--text-secondary); font-size:14px;">Payments are processed by Razorpay — a PCI DSS-compliant payment gateway. NearMatch never stores your card details.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="download" style="padding: 64px 0;">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Be first in line when NearMatch launches</h2>
+      <p>Join the waitlist — no spam, just an honest heads-up when we go live.</p>
+      <form id="waitlist-form" class="waitlist-form">
+        <input type="email" id="waitlist-email" placeholder="you@example.com" required autocomplete="email">
+        <button type="submit" id="waitlist-submit">Join the waitlist</button>
+      </form>
+      <p id="waitlist-message" class="waitlist-message" aria-live="polite"></p>
+      <span class="coming-soon-pill">📱 iOS &amp; Android — coming soon</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">NearMatch</div>
+        <p class="footer-tagline">Warm connections, just around the corner. Built with real safety at the core, not bolted on after.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Product</h5>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#safety">Trust &amp; Safety</a>
+          <a href="pricing.html">Pricing</a>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <a href="support.html">Support</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NearMatch. All rights reserved.</span>
+      <span>Made for people who want dating apps to take safety seriously.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal">
+    <h3 id="modal-title">Subscribe to Premium</h3>
+    <p id="modal-desc">Enter your details to continue to secure checkout via Razorpay.</p>
+    <div class="modal-price" id="modal-price">₹299</div>
+    <input type="text" class="modal-input" id="modal-name" placeholder="Your full name" />
+    <input type="email" class="modal-input" id="modal-email" placeholder="your@email.com" />
+    <input type="tel" class="modal-input" id="modal-phone" placeholder="Phone number (10 digits)" maxlength="10" />
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-pay" id="modal-pay-btn" onclick="initiatePayment()">Pay with Razorpay</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const SUPABASE_URL = 'https://ipwheuikchuoyskrfghi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd2hldWlrY2h1b3lza3JmZ2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0OTQ5MDgsImV4cCI6MjA5ODA3MDkwOH0.TtjuHj96qAB11ILbcLcZF8UKudzSq1XvY4Cflp1kD8o';
+  const RAZORPAY_KEY_ID = 'rzp_test_TElMNFQxCN7oI6';
+
+  const PLANS = {
+    monthly:   { name: 'Premium Monthly',   amount: 29900,  display: '₹299',       desc: '1 month of Premium access' },
+    quarterly: { name: 'Premium 3-Month',   amount: 49900,  display: '₹499',       desc: '3 months of Premium access' },
+    free:      { name: 'Free Plan',          amount: 0,      display: '₹0',         desc: 'Basic free access' },
+  };
+
+  let currentPlan = null;
+
+  function openModal(plan) {
+    if (plan === 'free') {
+      alert('Free plan will be available at app launch. Join the waitlist below to get notified!');
+      return;
+    }
+    currentPlan = plan;
+    const p = PLANS[plan];
+    document.getElementById('modal-title').textContent = p.name;
+    document.getElementById('modal-desc').textContent = p.desc + ' — secure checkout via Razorpay.';
+    document.getElementById('modal-price').textContent = p.display;
+    document.getElementById('payment-modal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('payment-modal').classList.remove('active');
+    document.getElementById('modal-name').value = '';
+    document.getElementById('modal-email').value = '';
+    document.getElementById('modal-phone').value = '';
+  }
+
+  document.getElementById('payment-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('payment-modal')) closeModal();
+  });
+
+  async function initiatePayment() {
+    const name  = document.getElementById('modal-name').value.trim();
+    const email = document.getElementById('modal-email').value.trim();
+    const phone = document.getElementById('modal-phone').value.trim();
+
+    if (!name || !email || !phone) {
+      alert('Please fill in all fields to continue.');
+      return;
+    }
+    if (!/^\d{10}$/.test(phone)) {
+      alert('Please enter a valid 10-digit phone number.');
+      return;
+    }
+
+    const btn = document.getElementById('modal-pay-btn');
+    btn.disabled = true;
+    btn.textContent = 'Creating order…';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/create-razorpay-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ plan: currentPlan }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create order');
+
+      const options = {
+        key: RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: 'INR',
+        name: 'NearMatch',
+        description: PLANS[currentPlan].name,
+        order_id: data.order_id,
+        prefill: { name, email, contact: phone },
+        theme: { color: '#E8603A' },
+        handler: function(response) {
+          closeModal();
+          showPaymentSuccess(response);
+        },
+        modal: {
+          ondismiss: function() {
+            btn.disabled = false;
+            btn.textContent = 'Pay with Razorpay';
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+      closeModal();
+
+    } catch (err) {
+      console.error(err);
+      alert('Could not connect to payment gateway. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Pay with Razorpay';
+    }
+  }
+
+  function showPaymentSuccess(response) {
+    const banner = document.createElement('div');
+    banner.style.cssText = `
+      position:fixed; top:24px; left:50%; transform:translateX(-50%);
+      background:#3DBE6B; color:white; font-family:'Quicksand',sans-serif;
+      font-weight:700; font-size:15px; padding:16px 28px; border-radius:50px;
+      box-shadow:0 8px 24px rgba(61,190,107,0.3); z-index:9999;
+    `;
+    banner.textContent = '🎉 Payment successful! You\'ll receive confirmation shortly.';
+    document.body.appendChild(banner);
+    setTimeout(() => banner.remove(), 6000);
+  }
+
+  // Waitlist form (same as index.html)
+  const wForm = document.getElementById('waitlist-form');
+  if (wForm) {
+    wForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailInput = document.getElementById('waitlist-email');
+      const submitBtn  = document.getElementById('waitlist-submit');
+      const message    = document.getElementById('waitlist-message');
+      const email = emailInput.value.trim();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Joining…';
+      message.textContent = '';
+      message.className = 'waitlist-message';
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ email }),
+        });
+        if (res.ok || res.status === 409) {
+          message.textContent = "You're on the list — we'll email you when NearMatch launches.";
+          message.className = 'waitlist-message success';
+          emailInput.value = '';
+        } else {
+          throw new Error('request failed');
+        }
+      } catch {
+        message.textContent = 'Something went wrong. Please try again.';
+        message.className = 'waitlist-message error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join the waitlist';
+      }
+    });
+  }
+</script>
+</body>
+</html>
