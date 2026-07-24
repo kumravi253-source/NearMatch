@@ -5,7 +5,7 @@ import { useFonts } from 'expo-font';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Quicksand_400Regular, Quicksand_500Medium, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import { supabase } from './src/lib/supabase';
-import { AGE_ATTESTATION_TEXT } from './src/lib/legal';
+import { AGE_ATTESTATION_TEXT, DPDP_CONSENT_TEXT } from './src/lib/legal';
 import { COLORS, FONTS } from './src/theme/theme';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
@@ -85,6 +85,17 @@ export default function App() {
       .then(({ error }) => {
         if (error && error.code !== '23505') {
           console.error('Failed to record age attestation', error);
+        }
+      });
+    // Same idea, but for DPDP Act 2023 consent to data processing —
+    // a separate durable record from the age attestation above, since
+    // they're distinct legal requirements.
+    supabase
+      .from('dpdp_consents')
+      .insert({ user_id: session.user.id, consent_text: DPDP_CONSENT_TEXT })
+      .then(({ error }) => {
+        if (error && error.code !== '23505') {
+          console.error('Failed to record DPDP consent', error);
         }
       });
   }, [session]);
