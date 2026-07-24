@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndi
 import { supabase } from '../../lib/supabase';
 import { COLORS, FONTS } from '../../theme/theme';
 
-const PRICING_URL = 'https://tiny-dasik-a8f240.netlify.app/pricing.html';
+const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
 export default function LikesScreen({ active }) {
   const [likes, setLikes] = useState([]);

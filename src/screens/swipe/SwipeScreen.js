@@ -10,7 +10,7 @@ import { COLORS, FONTS } from '../../theme/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
-const PRICING_URL = 'https://tiny-dasik-a8f240.netlify.app/pricing.html';
+const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
 export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge, onEditProfile, referralCode }) {
   const [profiles, setProfiles] = useState([]);
