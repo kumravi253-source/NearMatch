@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { COLORS, FONTS } from '../../theme/theme';
 
@@ -65,9 +65,11 @@ export default function LikesScreen({ active }) {
           <Text style={styles.emptySubtext}>
             This is a Premium feature — upgrade to instantly see everyone who's already liked your profile, no more guessing.
           </Text>
-          <TouchableOpacity style={styles.upgradeBtn} onPress={() => Linking.openURL(PRICING_URL)}>
-            <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
-          </TouchableOpacity>
+          {Platform.OS !== 'ios' && (
+            <TouchableOpacity style={styles.upgradeBtn} onPress={() => Linking.openURL(PRICING_URL)}>
+              <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, Animated, PanResponder,
-  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert, Linking,
+  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../../lib/supabase';
@@ -74,13 +74,21 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
         if (error.message?.includes('rate_limit_exceeded')) {
           Alert.alert("You're swiping fast!", 'Take a short break and try again in a minute.');
         } else if (error.message?.includes('daily_like_limit_reached')) {
+          // No purchase link on iOS: Apple's guidelines don't allow
+          // linking out to external payment for unlocking in-app
+          // features. Android keeps the link since Google's policy
+          // here is more permissive.
           Alert.alert(
             "You've used today's 10 free likes",
-            'Upgrade to Premium for unlimited likes, or come back tomorrow.',
-            [
-              { text: 'Not now', style: 'cancel' },
-              { text: 'Upgrade', onPress: () => Linking.openURL(PRICING_URL) },
-            ]
+            Platform.OS === 'ios'
+              ? 'Free plan allows 10 likes per day. Come back tomorrow for more.'
+              : 'Upgrade to Premium for unlimited likes, or come back tomorrow.',
+            Platform.OS === 'ios'
+              ? [{ text: 'OK' }]
+              : [
+                  { text: 'Not now', style: 'cancel' },
+                  { text: 'Upgrade', onPress: () => Linking.openURL(PRICING_URL) },
+                ]
           );
         }
         return;
@@ -116,7 +124,7 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
       `${isPremium ? "Unlimited likes, priority discovery, and you're visible in Who Liked You." : '10 likes/day. Upgrade for unlimited likes and to see who liked you.'}\n\n${walletLine}\n\nYour referral code: ${referralCode || '—'}\nShare it — friends who sign up with it earn you ₹100 each, with no limit.`,
       [
         { text: 'Copy referral code', onPress: () => referralCode && Clipboard.setStringAsync(referralCode) },
-        ...(isPremium ? [] : [{ text: 'Upgrade to Premium', onPress: () => Linking.openURL(PRICING_URL) }]),
+        ...(isPremium || Platform.OS === 'ios' ? [] : [{ text: 'Upgrade to Premium', onPress: () => Linking.openURL(PRICING_URL) }]),
         { text: 'Close', style: 'cancel' },
       ]
     );
