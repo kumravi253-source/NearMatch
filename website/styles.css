@@ -383,6 +383,7 @@ footer { padding: 56px 0 32px; }
 .countdown-label { display: block; font-size: 12px; margin-top: 6px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.04em; }
 .countdown-promo { margin-bottom: 24px; }
 .countdown-promo p { margin: 0 0 6px; }
+.countdown-tagline { font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.03em; }
 .countdown-claimed { font-size: 13px; opacity: 0.85; }
 .countdown-card .btn-primary { background: var(--white); color: var(--coral-dark); }
 .countdown-card .btn-primary:hover { background: var(--coral-light); }
