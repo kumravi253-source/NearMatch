@@ -592,9 +592,9 @@
         order_id: data.order_id,
         prefill: { name, email, contact: phone },
         theme: { color: '#E8603A' },
-        handler: function(response) {
+        handler: async function(response) {
           closeModal();
-          showPaymentSuccess(response);
+          await verifyAndGrantPremium(response, email);
         },
         modal: {
           ondismiss: function() {
@@ -616,17 +616,50 @@
     }
   }
 
-  function showPaymentSuccess(response) {
+  async function verifyAndGrantPremium(response, email) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/verify-razorpay-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          plan: currentPlan,
+          email,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.granted) {
+        showBanner('🎉 Payment successful! Premium is now active on your NearMatch account.', '#3DBE6B');
+      } else if (data.error === 'no_account_for_email') {
+        showBanner(`Payment received — sign up in the app with ${email} to activate Premium, or contact support.`, '#E8603A');
+      } else {
+        console.error('Payment verification failed', data);
+        showBanner('Payment received, but we could not confirm it automatically. Contact support with your payment ID.', '#E8603A');
+      }
+    } catch (err) {
+      console.error('verifyAndGrantPremium failed', err);
+      showBanner('Payment received, but we could not confirm it automatically. Contact support with your payment ID.', '#E8603A');
+    }
+  }
+
+  function showBanner(text, color) {
     const banner = document.createElement('div');
     banner.style.cssText = `
       position:fixed; top:24px; left:50%; transform:translateX(-50%);
-      background:#3DBE6B; color:white; font-family:'Quicksand',sans-serif;
+      background:${color}; color:white; font-family:'Quicksand',sans-serif;
       font-weight:700; font-size:15px; padding:16px 28px; border-radius:50px;
-      box-shadow:0 8px 24px rgba(61,190,107,0.3); z-index:9999;
+      box-shadow:0 8px 24px rgba(0,0,0,0.2); z-index:9999; max-width:90%; text-align:center;
     `;
-    banner.textContent = '🎉 Payment successful! You\'ll receive confirmation shortly.';
+    banner.textContent = text;
     document.body.appendChild(banner);
-    setTimeout(() => banner.remove(), 6000);
+    setTimeout(() => banner.remove(), 8000);
   }
 
   // Waitlist form (same as index.html)

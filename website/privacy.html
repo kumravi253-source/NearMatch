@@ -34,7 +34,7 @@
 
 <div class="container legal-page">
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: July 22, 2026</p>
+  <p class="updated">Last updated: July 24, 2026</p>
 
   <div class="legal-card">
     <p>This Privacy Policy explains what information NearMatch ("we", "us") collects when you use the NearMatch app, how we use it, and who we share it with. NearMatch is intended for users aged 18 and over.</p>
@@ -47,8 +47,11 @@
       <li><strong>Profile information:</strong> your name, age, gender, bio, interests, and avatar or profile photo.</li>
       <li><strong>Verification data:</strong> if you choose to verify your age, a selfie you take is sent to our age-estimation provider for a single one-time check. <strong>We do not store this selfie.</strong> We store only the result of the check (pass/fail and an estimated age range) and the timestamp.</li>
       <li><strong>Activity data:</strong> the swipes you make, the matches you form, and the messages you send.</li>
+      <li><strong>Location:</strong> if you grant permission, your device's approximate coordinates, used to show you people nearby and sort matches by distance. <strong>Your exact coordinates are never shared with other users or stored anywhere they could read it</strong> — only a fuzzy range like "3-5 km away" is ever computed for another person to see. You can deny this permission and still use NearMatch; matching falls back to showing newer profiles first.</li>
       <li><strong>Safety reports:</strong> any blocks or reports you submit against other users, including the reason given.</li>
       <li><strong>Legal attestation:</strong> a timestamped record that you confirmed you are 18 or older at signup.</li>
+      <li><strong>Subscription status:</strong> if you purchase Premium, the plan, dates, and payment reference (not your card/UPI details — see Razorpay below). Other users only ever see a "Premium" badge, never your payment history.</li>
+      <li><strong>Referral and wallet data:</strong> your unique referral code, who signed up using it, and your wallet credit balance and history.</li>
     </ul>
 
     <h2>How we use this information</h2>
@@ -57,6 +60,7 @@
       <li>To verify age eligibility and maintain a safe user base.</li>
       <li>To enforce blocking and review reports of misconduct.</li>
       <li>To prevent spam and abuse through automated rate limiting.</li>
+      <li>To show you nearby profiles first and display an approximate distance between you and other users.</li>
     </ul>
 
     <h2>Who we share data with</h2>
@@ -69,7 +73,7 @@
     <p>We do not sell your personal information to third parties.</p>
 
     <h2>Other users can see</h2>
-    <p>Your name, age, photo or avatar, bio, interests, and verification badge are visible to other users as part of normal app functionality. Your email address, password, and exact match/report history are never shown to other users.</p>
+    <p>Your name, age, photo or avatar, bio, interests, verification badge, and a fuzzy distance range (e.g. "3-5 km away") are visible to other users as part of normal app functionality. Your email address, password, exact coordinates, and exact match/report history are never shown to other users — the app itself never computes or transmits your precise location to anyone but you.</p>
 
     <h2>Data security</h2>
     <p>Access to your data is restricted using row-level database security, meaning the backend enforces — not just the app's interface — who can read or write which records. Blocked users are prevented from matching or messaging at the database level.</p>
