@@ -76,6 +76,26 @@
   </div>
 </header>
 
+<section id="launch-countdown" class="countdown-section">
+  <div class="container">
+    <div class="countdown-card">
+      <span class="eyebrow">🚀 Launching September 1, 2026</span>
+      <h2>NearMatch goes live in</h2>
+      <div class="countdown-grid" id="countdown-grid">
+        <div class="countdown-unit"><span class="countdown-num" id="cd-days">--</span><span class="countdown-label">Days</span></div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-label">Hours</span></div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-mins">--</span><span class="countdown-label">Min</span></div>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-secs">--</span><span class="countdown-label">Sec</span></div>
+      </div>
+      <div class="countdown-promo">
+        <p><strong>First 300 people to download at launch get 15 days of unlimited likes, free.</strong></p>
+        <p class="countdown-claimed" id="countdown-claimed">Loading claim count…</p>
+      </div>
+      <a class="btn btn-primary" href="#download">Join the waitlist to be first</a>
+    </div>
+  </div>
+</section>
+
 <section id="features">
   <div class="container">
     <div class="section-head">
@@ -381,6 +401,72 @@
       submitBtn.textContent = 'Join the waitlist';
     }
   });
+
+  // Launch countdown — ticks down to Sept 1, 2026, 00:00 IST. Kept in
+  // sync with the same cutoff enforced server-side in
+  // claim_launch_promo(), so this is purely display; the real
+  // enforcement (and the 300-slot cap) lives in the database, not here.
+  const LAUNCH_AT = new Date('2026-09-01T00:00:00+05:30').getTime();
+
+  function updateCountdown() {
+    const diff = LAUNCH_AT - Date.now();
+    const daysEl = document.getElementById('cd-days');
+    const hoursEl = document.getElementById('cd-hours');
+    const minsEl = document.getElementById('cd-mins');
+    const secsEl = document.getElementById('cd-secs');
+    if (!daysEl) return;
+
+    if (diff <= 0) {
+      daysEl.textContent = '0';
+      hoursEl.textContent = '0';
+      minsEl.textContent = '0';
+      secsEl.textContent = '0';
+      return;
+    }
+
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
+
+    daysEl.textContent = days;
+    hoursEl.textContent = String(hours).padStart(2, '0');
+    minsEl.textContent = String(mins).padStart(2, '0');
+    secsEl.textContent = String(secs).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Live claimed-count for the launch promo, read from the same
+  // function the app uses — never hardcoded, so it can't drift from
+  // what's actually true in the database.
+  async function loadPromoClaimedCount() {
+    const claimedEl = document.getElementById('countdown-claimed');
+    if (!claimedEl) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_launch_promo_claimed_count`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: '{}',
+      });
+      const claimed = await res.json();
+      if (res.ok && typeof claimed === 'number') {
+        const remaining = Math.max(0, 300 - claimed);
+        claimedEl.textContent = remaining > 0
+          ? `${claimed} of 300 claimed — ${remaining} spots left`
+          : 'All 300 spots claimed';
+      } else {
+        claimedEl.textContent = '300 spots available at launch';
+      }
+    } catch {
+      claimedEl.textContent = '300 spots available at launch';
+    }
+  }
+  loadPromoClaimedCount();
 </script>
 </body>
 </html>
