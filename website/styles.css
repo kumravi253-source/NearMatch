@@ -328,15 +328,27 @@ section { padding: 80px 0; }
   margin-top: 20px;
 }
 .waitlist-form {
-  display: flex; gap: 10px; max-width: 420px; margin: 0 auto; flex-wrap: wrap;
+  display: flex; gap: 10px; max-width: 460px; margin: 0 auto; flex-wrap: wrap;
 }
-.waitlist-form input[type="email"] {
-  flex: 1; min-width: 200px; padding: 14px 18px; border-radius: 14px; border: none;
+.waitlist-form input[type="email"],
+.waitlist-form input[type="text"] {
+  flex: 1 1 100%; min-width: 0; padding: 14px 18px; border-radius: 14px; border: none;
   font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--text-primary);
 }
 .waitlist-form button {
   background: var(--white); color: var(--coral); border: none; border-radius: 14px;
   padding: 14px 22px; font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer;
+  flex: 1 1 100%;
+}
+@media (min-width: 520px) {
+  .waitlist-form input[type="text"] { flex: 1 1 45%; }
+  .waitlist-form input[type="email"] { flex: 1 1 45%; }
+  .waitlist-form button { flex: 1 1 100%; }
+}
+/* Honeypot — off-screen rather than display:none, which some bots skip. */
+.hp-field {
+  position: absolute; left: -9999px; top: auto;
+  width: 1px; height: 1px; overflow: hidden;
 }
 .waitlist-form button:disabled { opacity: 0.7; cursor: default; }
 .waitlist-message { min-height: 20px; margin: 14px 0 0; font-size: 13px; font-weight: 700; }
