@@ -354,6 +354,8 @@ section { padding: 80px 0; }
 .waitlist-message { min-height: 20px; margin: 14px 0 0; font-size: 13px; font-weight: 700; }
 .waitlist-message.success { color: var(--white); }
 .waitlist-message.error { color: #FFE0D8; }
+.waitlist-consent { margin: 10px 0 0; font-size: 12px; opacity: 0.85; }
+.waitlist-consent a { color: var(--white); text-decoration: underline; }
 
 footer { padding: 56px 0 32px; }
 .footer-grid { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 32px; margin-bottom: 32px; }
