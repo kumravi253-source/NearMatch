@@ -317,26 +317,10 @@
     <div class="cta-banner">
       <h2>Be first in line when NearMatch launches</h2>
       <p>We're finishing up testing now. No spam, no fake countdown timers — just an honest heads-up when it's live.</p>
-      <form id="waitlist-form" class="waitlist-form" method="POST" target="waitlist-sink"
-            action="https://computing-force-5028.my.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&amp;orgId=00DIf000000K4nmMAC">
-        <input type="hidden" name="oid" value="00DIf000000K4nm">
-        <input type="hidden" name="retURL" value="https://nearmatch.in/thankyou.html">
-        <input type="hidden" name="lead_source" value="Website Waitlist">
-        <!-- Company is required on the Salesforce Lead object. Consumer signups
-             have none, so it is set here to keep leads from being rejected. -->
-        <input type="hidden" name="company" value="NearMatch Waitlist">
-        <!-- first_name is populated by JS from the visible name field. -->
-        <input type="hidden" name="first_name" id="wl-first" value="">
-        <!-- Honeypot: hidden from humans, filled by bots, checked on submit. -->
-        <div class="hp-field" aria-hidden="true">
-          <label for="wl-hp">Leave this empty</label>
-          <input type="text" id="wl-hp" name="hp_check" tabindex="-1" autocomplete="off">
-        </div>
-        <input type="text" id="wl-name" name="last_name" maxlength="80" placeholder="Your name" required autocomplete="name">
-        <input type="email" id="waitlist-email" name="email" maxlength="80" placeholder="you@example.com" required autocomplete="email">
+      <form id="waitlist-form" class="waitlist-form">
+        <input type="email" id="waitlist-email" placeholder="you@example.com" required autocomplete="email">
         <button type="submit" id="waitlist-submit">Join the waitlist</button>
       </form>
-      <iframe name="waitlist-sink" id="waitlist-sink" title="Form submission target" style="display:none;border:0;width:0;height:0"></iframe>
       <p id="waitlist-message" class="waitlist-message" aria-live="polite"></p>
       <p class="waitlist-consent">We'll only use this to email you once at launch. See our <a href="privacy.html">Privacy Policy</a>.</p>
       <span class="coming-soon-pill">📱 iOS &amp; Android — coming soon</span>
@@ -381,68 +365,42 @@
   const SUPABASE_URL = 'https://ipwheuikchuoyskrfghi.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd2hldWlrY2h1b3lza3JmZ2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0OTQ5MDgsImV4cCI6MjA5ODA3MDkwOH0.TtjuHj96qAB11ILbcLcZF8UKudzSq1XvY4Cflp1kD8o';
 
-  // Waitlist signups go to Salesforce via Web-to-Lead. Web-to-Lead has no
-  // CORS-enabled API and returns no machine-readable result, so the form does
-  // a native POST into a hidden iframe. That keeps the visitor on the page
-  // instead of redirecting them to retURL.
-  //
-  // IMPORTANT: the iframe 'load' event only tells us the POST completed — it
-  // does NOT confirm Salesforce accepted the lead, and cross-origin rules stop
-  // us reading the response. The success message below is therefore optimistic.
-  // Verify real delivery in the Salesforce Leads list view, not from the UI.
-  const waitlistForm = document.getElementById('waitlist-form');
-  const waitlistSink = document.getElementById('waitlist-sink');
-  let waitlistPending = false;
-
-  waitlistForm.addEventListener('submit', (e) => {
-    const nameInput = document.getElementById('wl-name');
-    const firstHidden = document.getElementById('wl-first');
+  document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('waitlist-email');
     const submitBtn = document.getElementById('waitlist-submit');
     const message = document.getElementById('waitlist-message');
+    const email = emailInput.value.trim();
 
-    // Bot filled the honeypot — drop it silently so it looks like a success.
-    if (document.getElementById('wl-hp').value !== '') {
-      e.preventDefault();
-      message.textContent = "You're on the list — we'll email you when NearMatch launches.";
-      message.className = 'waitlist-message success';
-      waitlistForm.reset();
-      return;
-    }
-
-    // Salesforce requires last_name. Split "Ada Lovelace" into
-    // first_name="Ada" / last_name="Lovelace"; a single word stays as last_name.
-    const parts = nameInput.value.trim().split(/\s+/);
-    if (parts.length > 1) {
-      firstHidden.value = parts.slice(0, -1).join(' ');
-      nameInput.value = parts[parts.length - 1];
-    } else {
-      firstHidden.value = '';
-    }
-
-    waitlistPending = true;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Joining…';
     message.textContent = '';
     message.className = 'waitlist-message';
-    // Native POST continues into the hidden iframe from here.
-  });
 
-  waitlistSink.addEventListener('load', () => {
-    if (!waitlistPending) return; // ignore the initial about:blank load
-    waitlistPending = false;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ email }),
+      });
 
-    const submitBtn = document.getElementById('waitlist-submit');
-    const message = document.getElementById('waitlist-message');
-
-    message.textContent = "You're on the list — we'll email you when NearMatch launches.";
-    message.className = 'waitlist-message success';
-    waitlistForm.reset();
-    document.getElementById('wl-first').value = '';
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Join the waitlist';
-
-    if (typeof gtag === 'function') {
-      gtag('event', 'generate_lead', { event_category: 'waitlist', event_label: 'salesforce_w2l' });
+      if (res.ok || res.status === 409) {
+        message.textContent = "You're on the list — we'll email you when NearMatch launches.";
+        message.className = 'waitlist-message success';
+        emailInput.value = '';
+      } else {
+        throw new Error('request failed');
+      }
+    } catch (err) {
+      message.textContent = 'Something went wrong. Please try again.';
+      message.className = 'waitlist-message error';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Join the waitlist';
     }
   });
 

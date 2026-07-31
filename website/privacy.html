@@ -57,9 +57,9 @@
     <h2>Website waitlist</h2>
     <p>Separately from the app, you can join our launch waitlist on nearmatch.in without creating an account. This section covers that, and only that.</p>
     <ul>
-      <li><strong>What we collect:</strong> the name and email address you type into the waitlist form. Nothing else — no phone number, no location, no tracking of who you are beyond what you enter.</li>
+      <li><strong>What we collect:</strong> the email address you type into the waitlist form. Nothing else — no name, no phone number, no location, no tracking of who you are beyond what you enter.</li>
       <li><strong>Why:</strong> to email you once when NearMatch launches. We do not use waitlist details for advertising, we do not add you to a marketing list, and we do not sell or share them with anyone outside the providers named below.</li>
-      <li><strong>Where it goes:</strong> waitlist entries are stored in <strong>Salesforce</strong>, a customer-records service. Salesforce processes and stores this data on servers outside India, including in the United States.</li>
+      <li><strong>Where it goes:</strong> waitlist entries are stored in <strong>Supabase</strong>, the same database infrastructure that runs the app.</li>
       <li><strong>Your consent:</strong> submitting the waitlist form is your consent to the above. You are not creating an account and our <a href="terms.html">Terms of Service</a> do not apply to you until you sign up in the app.</li>
       <li><strong>How long we keep it:</strong> until six months after launch, or until you ask us to remove you — whichever comes first. After that the entry is deleted.</li>
       <li><strong>Removing yourself:</strong> email <a href="mailto:getsupport@nearmatch.in">getsupport@nearmatch.in</a> from the address you signed up with and we will delete your entry. You do not need an account, and you do not need to give a reason.</li>
@@ -77,10 +77,9 @@
     <h2>Who we share data with</h2>
     <p>We use the following service providers to operate NearMatch. They process data on our behalf and are not permitted to use it for their own purposes:</p>
     <ul>
-      <li><strong>Supabase</strong> — our database, authentication, file storage, and real-time messaging infrastructure.</li>
+      <li><strong>Supabase</strong> — our database, authentication, file storage, and real-time messaging infrastructure. Also stores website waitlist entries (email address only).</li>
       <li><strong>Face++ (Megvii)</strong> — processes the selfie image solely to estimate age during the optional verification step. The image is sent for this one check and is not stored by NearMatch.</li>
       <li><strong>Razorpay</strong> — processes your name, email, and phone number when you purchase a Premium subscription, and handles the payment itself. NearMatch never receives or stores your card, UPI, or bank details — Razorpay is a PCI DSS-compliant payment gateway that handles this directly.</li>
-      <li><strong>Salesforce</strong> — stores the name and email address submitted through the launch waitlist form on our website. This applies only to waitlist signups, not to app accounts. Salesforce stores this data outside India, including in the United States.</li>
     </ul>
     <p>Some of these providers process data outside India. Where that happens, it is only for the purposes described above and only with providers bound to process the data on our instructions.</p>
     <p>We do not sell your personal information to third parties.</p>
