@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
       ? new Date(payload.record.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
       : new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
-    // ── 1. Email via Resend (send from Resend shared domain until nearmatch.in is verified) ──
+    // ── 1. Email via Resend (nearmatch.in is verified, send from our own domain) ──
     const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "NearMatch Waitlist <onboarding@resend.dev>",
+        from: "NearMatch Waitlist <waitlist@nearmatch.in>",
         to:   [NOTIFY_EMAIL],
         subject: `New waitlist signup - ${email}`,
         html: `
