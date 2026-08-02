@@ -70,7 +70,12 @@ $$;
 -- first when the viewer has a location on file, falling back to the
 -- original newest-first ordering when they don't (e.g. denied the
 -- permission prompt). Returns a distance_label, never raw distance or
--- coordinates.
+-- coordinates. Changes the return type from the original (setof
+-- public.profiles) to a table with the extra distance_label column —
+-- Postgres won't let CREATE OR REPLACE change a return type, so the
+-- old signature has to be dropped first.
+drop function if exists public.get_candidate_profiles(int);
+
 create or replace function public.get_candidate_profiles(p_limit int default 30)
 returns table (
   id uuid,
