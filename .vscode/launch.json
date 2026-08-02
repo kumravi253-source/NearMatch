@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "https://claude.ai/code/session_01QnwERgmMG6y1pVRzkrWAYQ",
+            "request": "launch",
+            "url": "https://claude.ai/code/session_01QnwERgmMG6y1pVRzkrWAYQ"
+        }
+    ]
+}
