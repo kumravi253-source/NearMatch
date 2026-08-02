@@ -6,12 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#E8603A"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.kumravi253.nearmatch",
@@ -25,7 +19,6 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#E8603A"
       },
-      "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ]
@@ -47,7 +40,16 @@
           "locationWhenInUsePermission": "NearMatch uses your approximate location to show you people nearby. Your exact location is never shared with other users — only a fuzzy distance like \"3-5 km away\"."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#E8603A"
+        }
+      ]
     ],
     "extra": {
       "eas": {
