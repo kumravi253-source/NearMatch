@@ -41,3 +41,6 @@ yarn-error.*
 /ios
 /android
 .netlify/
+
+# local Claude Code permissions (may accumulate secrets from approved commands)
+.claude/settings.local.json
