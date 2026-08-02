@@ -439,14 +439,18 @@
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  // Live claimed-count for the launch promo, read from the same
-  // function the app uses — never hardcoded, so it can't drift from
-  // what's actually true in the database.
-  async function loadPromoClaimedCount() {
+  // Before launch, nobody can claim the promo yet — claim_launch_promo()
+  // is a hard no-op until Sept 1, so the claimed count would sit at 0
+  // for the entire pre-launch window. Show waitlist momentum instead,
+  // worded so it never implies those signups are guaranteed a promo
+  // spot, then switch to the real claimed count once launch happens.
+  async function loadCounterStatus() {
     const claimedEl = document.getElementById('countdown-claimed');
     if (!claimedEl) return;
+    const launched = Date.now() >= LAUNCH_AT;
+    const rpc = launched ? 'get_launch_promo_claimed_count' : 'get_waitlist_count';
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_launch_promo_claimed_count`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpc}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -455,20 +459,24 @@
         },
         body: '{}',
       });
-      const claimed = await res.json();
-      if (res.ok && typeof claimed === 'number') {
-        const remaining = Math.max(0, 300 - claimed);
+      const count = await res.json();
+      if (!res.ok || typeof count !== 'number') {
+        claimedEl.textContent = '300 spots available at launch';
+        return;
+      }
+      if (launched) {
+        const remaining = Math.max(0, 300 - count);
         claimedEl.textContent = remaining > 0
-          ? `${claimed} of 300 claimed — ${remaining} spots left`
+          ? `${count} of 300 claimed — ${remaining} spots left`
           : 'All 300 spots claimed';
       } else {
-        claimedEl.textContent = '300 spots available at launch';
+        claimedEl.textContent = `${count} people already waiting — first 300 to sign up at launch get the deal`;
       }
     } catch {
       claimedEl.textContent = '300 spots available at launch';
     }
   }
-  loadPromoClaimedCount();
+  loadCounterStatus();
 </script>
 </body>
 </html>
