@@ -116,6 +116,15 @@ export default function App() {
         }
       });
     }
+    // Launch promo: first 300 signups on or after launch get 15 days
+    // of free Premium. The function itself enforces the date and the
+    // 300-slot cap server-side and just no-ops (returns false) outside
+    // those conditions, so it's safe to call unconditionally here too.
+    supabase.rpc('claim_launch_promo').then(({ error }) => {
+      if (error) {
+        console.error('Failed to claim launch promo', error);
+      }
+    });
   }, [session]);
 
   useEffect(() => {
