@@ -13,7 +13,7 @@
       "backgroundColor": "#E8603A"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.kumravi253.nearmatch",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
