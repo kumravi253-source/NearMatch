@@ -66,7 +66,7 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
   };
 
   const handleContinue = async () => {
-    if (!name || !age || !gender || !bio) {
+    if (!name || !age || !gender) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
