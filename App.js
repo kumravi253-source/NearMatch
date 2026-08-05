@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
+import { ObserveRoot, useObserve } from 'expo-observe';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Quicksand_400Regular, Quicksand_500Medium, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import { supabase } from './src/lib/supabase';
@@ -23,7 +24,8 @@ const TABS = [
   { key: 'chat', label: 'Chat', icon: '💬' },
 ];
 
-export default function App() {
+function App() {
+  const { markInteractive } = useObserve();
   const [fontsLoaded] = useFonts({
     Pacifico_400Regular,
     Quicksand_400Regular,
@@ -138,6 +140,15 @@ export default function App() {
     locationRequestedRef.current = true;
     requestAndSaveLocation(session.user.id);
   }, [session, profile]);
+
+  useEffect(() => {
+    // Fires once the loading gate below clears, whichever screen the
+    // user lands on: the logged-out splash, profile setup for new
+    // signups, or the main tabs for returning users.
+    const stillLoading = !fontsLoaded || session === undefined || (session && profile === undefined);
+    if (stillLoading) return;
+    markInteractive();
+  }, [fontsLoaded, session, profile, markInteractive]);
 
   const handleProfileComplete = (savedProfile) => {
     setProfile(savedProfile);
@@ -284,3 +295,5 @@ const styles = StyleSheet.create({
   tabLabel: { fontFamily: FONTS.medium, fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
   tabLabelActive: { fontFamily: FONTS.bold, color: COLORS.coral },
 });
+
+export default ObserveRoot.wrap(App);
