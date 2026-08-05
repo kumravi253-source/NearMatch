@@ -172,58 +172,69 @@
 
 <section id="safety">
   <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Trust &amp; Safety</span>
-      <h2>Safety isn't a checkbox here — it's the architecture</h2>
-      <p>Most of the engineering effort in NearMatch went into the parts you never see directly.</p>
-    </div>
     <div class="safety-grid">
-      <ul class="safety-list">
-        <li class="safety-item">
-          <div class="dot">18+</div>
-          <div>
-            <h4>Explicit age attestation</h4>
-            <p>Every signup requires an affirmative, timestamped 18+ confirmation — recorded, not assumed.</p>
-          </div>
-        </li>
-        <li class="safety-item">
-          <div class="dot">🤳</div>
-          <div>
-            <h4>Optional AI selfie verification</h4>
-            <p>A face-detection check estimates age conservatively and only confirms a badge when it clears a safety margin above 18. The photo is never stored.</p>
-          </div>
-        </li>
-        <li class="safety-item">
-          <div class="dot">⛔</div>
-          <div>
-            <h4>Real blocking, enforced everywhere</h4>
-            <p>Blocking isn't just a UI filter — it's checked at the database level for matching and messaging, so a blocked pair can't reconnect through any path.</p>
-          </div>
-        </li>
-        <li class="safety-item">
-          <div class="dot">🚩</div>
-          <div>
-            <h4>One-tap reporting</h4>
-            <p>Report inappropriate photos, harassment, fake profiles, or spam directly from any profile or conversation.</p>
-          </div>
-        </li>
-        <li class="safety-item">
-          <div class="dot">⏱️</div>
-          <div>
-            <h4>Rate limiting against spam &amp; bots</h4>
-            <p>Swipes and messages are throttled server-side, making large-scale spam or scraping impractical.</p>
-          </div>
-        </li>
-      </ul>
+      <div>
+        <div class="section-head safety-head">
+          <span class="eyebrow">Trust &amp; Safety</span>
+          <h2>Safety isn't a checkbox here — it's the architecture</h2>
+          <p>Most of the engineering effort in NearMatch went into the parts you never see directly.</p>
+        </div>
+        <ul class="safety-list">
+          <li class="safety-item">
+            <div class="safety-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div>
+              <h4>Explicit age attestation</h4>
+              <p>Every signup requires an affirmative, timestamped 18+ confirmation — recorded, not assumed.</p>
+            </div>
+          </li>
+          <li class="safety-item">
+            <div class="safety-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.2"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+            <div>
+              <h4>Optional AI selfie verification</h4>
+              <p>A face-detection check estimates age conservatively and only confirms a badge when it clears a safety margin above 18. The photo is never stored.</p>
+            </div>
+          </li>
+          <li class="safety-item">
+            <div class="safety-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></svg></div>
+            <div>
+              <h4>Real blocking, enforced everywhere</h4>
+              <p>Blocking isn't just a UI filter — it's checked at the database level for matching and messaging, so a blocked pair can't reconnect through any path.</p>
+            </div>
+          </li>
+          <li class="safety-item">
+            <div class="safety-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4l16 6-7 2-2 7-7 2z"/></svg></div>
+            <div>
+              <h4>One-tap reporting</h4>
+              <p>Report inappropriate photos, harassment, fake profiles, or spam directly from any profile or conversation.</p>
+            </div>
+          </li>
+          <li class="safety-item">
+            <div class="safety-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+            <div>
+              <h4>Rate limiting against spam &amp; bots</h4>
+              <p>Swipes, messages, and payment orders are throttled server-side, making large-scale spam or scraping impractical.</p>
+            </div>
+          </li>
+        </ul>
+        <div class="ledger">
+          <p class="ledger-caption">A few of the actual rules running in the database</p>
+          <div class="ledger-row"><span class="ledger-key">age_verifications</span><span class="ledger-val">aws_rekognition + face++ fallback</span></div>
+          <div class="ledger-row"><span class="ledger-key">blocks_prevent_matching_and_messaging</span><span class="ledger-val">enforced in matches + messages RLS</span></div>
+          <div class="ledger-row"><span class="ledger-key">razorpay_order_rate_limit</span><span class="ledger-val">throttled server-side</span></div>
+          <div class="ledger-row"><span class="ledger-key">legal_attestations</span><span class="ledger-val">timestamped, immutable</span></div>
+        </div>
+      </div>
       <div class="phone" style="width:260px; height:540px;">
         <div class="phone-screen">
           <div class="mock-header" style="justify-content:center;">
-            <span class="mock-title">Verify your age 🌸</span>
+            <span class="mock-title">Verify your age</span>
           </div>
           <div style="text-align:center; font-size:12px; color:var(--text-secondary); margin-bottom:18px;">
             Take a quick selfie to get a Verified badge. The photo is never stored.
           </div>
-          <div style="width:160px; height:160px; border-radius:80px; background:var(--coral-light); border:2px solid var(--coral-border); margin:0 auto 24px; display:flex; align-items:center; justify-content:center; font-size:48px;">🤳</div>
+          <div style="width:160px; height:160px; border-radius:80px; background:var(--coral-light); border:2px solid var(--coral-border); margin:0 auto 24px; display:flex; align-items:center; justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral-dark)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:56px; height:56px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          </div>
           <div style="border:1.5px solid var(--teal); border-radius:14px; padding:12px; text-align:center; font-size:13px; font-weight:700; color:var(--teal-dark); margin-bottom:10px;">Take Selfie</div>
           <div style="background:var(--coral); border-radius:14px; padding:12px; text-align:center; font-size:13px; font-weight:700; color:var(--white);">Verify</div>
         </div>
