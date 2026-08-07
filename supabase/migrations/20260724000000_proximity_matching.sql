@@ -107,7 +107,7 @@ as $$
     ) as distance_label
   from public.profiles p
   left join public.profile_locations pl on pl.user_id = p.id
-  cross join viewer_location v
+  left join viewer_location v on true
   where p.id <> auth.uid()
     and not exists (
       select 1 from public.swipes s
