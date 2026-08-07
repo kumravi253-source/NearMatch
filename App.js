@@ -86,9 +86,12 @@ export default function App() {
     // user_id, so repeat logins are harmless no-ops).
     supabase
       .from('legal_attestations')
-      .insert({ user_id: session.user.id, attestation_text: AGE_ATTESTATION_TEXT })
+      .upsert(
+        { user_id: session.user.id, attestation_text: AGE_ATTESTATION_TEXT },
+        { onConflict: 'user_id', ignoreDuplicates: true }
+      )
       .then(({ error }) => {
-        if (error && error.code !== '23505') {
+        if (error) {
           console.error('Failed to record age attestation', error);
         }
       });
@@ -97,9 +100,12 @@ export default function App() {
     // they're distinct legal requirements.
     supabase
       .from('dpdp_consents')
-      .insert({ user_id: session.user.id, consent_text: DPDP_CONSENT_TEXT })
+      .upsert(
+        { user_id: session.user.id, consent_text: DPDP_CONSENT_TEXT },
+        { onConflict: 'user_id', ignoreDuplicates: true }
+      )
       .then(({ error }) => {
-        if (error && error.code !== '23505') {
+        if (error) {
           console.error('Failed to record DPDP consent', error);
         }
       });
