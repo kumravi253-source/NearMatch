@@ -115,6 +115,16 @@ $$;
 -- Premium candidate outranks a non-Premium one regardless of
 -- distance/recency; within the same Premium tier, prior ordering
 -- (nearest first, or newest first with no viewer location) applies.
+--
+-- NOTE (2026-08-07): this file originally CROSS JOINed viewer_location,
+-- which drops every candidate to zero rows for a viewer with no saved
+-- location. That bug was fixed forward in 20260802000002 and reapplied in
+-- 20260805000000 and 20260807000000 after regressing twice, but this file
+-- itself was never corrected — its stale CROSS JOIN text was found being
+-- re-executed directly against production (see 20260807000000's
+-- migration file and security-reports/2026-08-07.md for the
+-- pg_stat_statements trail). Fixed here at the source so a full replay
+-- of this migration can no longer reintroduce the bug.
 create or replace function public.get_candidate_profiles(p_limit int default 30)
 returns table (
   id uuid,
@@ -146,7 +156,7 @@ as $$
     ) as distance_label
   from public.profiles p
   left join public.profile_locations pl on pl.user_id = p.id
-  cross join viewer_location v
+  left join viewer_location v on true
   where p.id <> auth.uid()
     and not exists (
       select 1 from public.swipes s
@@ -173,6 +183,9 @@ grant execute on function public.get_candidate_profiles(int) to authenticated;
 -- drop out of this list). Premium-gated: raises a distinct error the
 -- client uses to show an upsell instead of an empty list, so "no likes
 -- yet" and "you're not Premium" never look the same to the user.
+--
+-- NOTE (2026-08-07): same CROSS JOIN fix as get_candidate_profiles above
+-- applied here — see that note for context.
 create or replace function public.get_pending_likes(p_limit int default 30)
 returns table (
   id uuid,
@@ -208,7 +221,7 @@ begin
   from public.swipes s
   join public.profiles p on p.id = s.swiper_id
   left join public.profile_locations pl on pl.user_id = p.id
-  cross join viewer_location v
+  left join viewer_location v on true
   where s.swiped_id = auth.uid()
     and s.direction = 'like'
     and not exists (
