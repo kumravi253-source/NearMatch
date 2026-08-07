@@ -35,6 +35,12 @@
           "cameraPermission": "NearMatch needs access to your camera so you can take a profile picture."
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "NearMatch uses your approximate location to show you people nearby. Your exact location is never shared with other users — only a fuzzy distance like \"3-5 km away\"."
+        }
+      ],
       "expo-font"
     ],
     "extra": {

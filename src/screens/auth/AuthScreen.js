@@ -11,6 +11,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [attested, setAttested] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +46,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
           setMode('login');
           return;
         }
-        onSuccess('signup');
+        onSuccess('signup', referralCode.trim());
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
@@ -98,6 +99,18 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
           onChangeText={setPassword}
           secureTextEntry
         />
+
+        {mode === 'signup' && (
+          <TextInput
+            style={styles.input}
+            placeholder="Referral code (optional)"
+            placeholderTextColor={COLORS.textSecondary}
+            value={referralCode}
+            onChangeText={setReferralCode}
+            autoCapitalize="characters"
+            autoCorrect={false}
+          />
+        )}
 
         {mode === 'signup' && (
           <TouchableOpacity

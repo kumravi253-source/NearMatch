@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, Animated, PanResponder,
-  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert,
+  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../../lib/supabase';
+import { getPremiumStatus, getWalletBalancePaise, formatPaiseAsRupees } from '../../lib/premium';
 import { COLORS, FONTS } from '../../theme/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
+const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
-export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge, onEditProfile }) {
+export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge, onEditProfile, referralCode }) {
   const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -70,6 +73,23 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
         console.error('Failed to record swipe', error);
         if (error.message?.includes('rate_limit_exceeded')) {
           Alert.alert("You're swiping fast!", 'Take a short break and try again in a minute.');
+        } else if (error.message?.includes('daily_like_limit_reached')) {
+          // No purchase link on iOS: Apple's guidelines don't allow
+          // linking out to external payment for unlocking in-app
+          // features. Android keeps the link since Google's policy
+          // here is more permissive.
+          Alert.alert(
+            "You've used today's 10 free likes",
+            Platform.OS === 'ios'
+              ? 'Free plan allows 10 likes per day. Come back tomorrow for more.'
+              : 'Upgrade to Premium for unlimited likes, or come back tomorrow.',
+            Platform.OS === 'ios'
+              ? [{ text: 'OK' }]
+              : [
+                  { text: 'Not now', style: 'cancel' },
+                  { text: 'Upgrade', onPress: () => Linking.openURL(PRICING_URL) },
+                ]
+          );
         }
         return;
       }
@@ -85,9 +105,27 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
       'What would you like to do?',
       [
         { text: 'Edit Profile', onPress: onEditProfile },
+        { text: 'Premium & Wallet', onPress: handlePremiumMenu },
         { text: 'Sign Out', onPress: onSignOut },
         { text: 'Delete Account', style: 'destructive', onPress: handleDeleteAccount },
         { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handlePremiumMenu = async () => {
+    const [isPremium, walletPaise] = await Promise.all([getPremiumStatus(), getWalletBalancePaise()]);
+    const walletLine = walletPaise > 0
+      ? `Wallet balance: ${formatPaiseAsRupees(walletPaise)} (applied automatically toward your next Premium purchase)`
+      : 'Wallet balance: ₹0';
+
+    Alert.alert(
+      isPremium ? 'You are Premium 👑' : 'Free plan',
+      `${isPremium ? "Unlimited likes, priority discovery, and you're visible in Who Liked You." : '10 likes/day. Upgrade for unlimited likes and to see who liked you.'}\n\n${walletLine}\n\nYour referral code: ${referralCode || '—'}\nShare it — friends who sign up with it earn you ₹100 each, with no limit.`,
+      [
+        { text: 'Copy referral code', onPress: () => referralCode && Clipboard.setStringAsync(referralCode) },
+        ...(isPremium || Platform.OS === 'ios' ? [] : [{ text: 'Upgrade to Premium', onPress: () => Linking.openURL(PRICING_URL) }]),
+        { text: 'Close', style: 'cancel' },
       ]
     );
   };
@@ -303,6 +341,7 @@ function ProfileCard({ profile }) {
           <Text style={styles.name}>{profile.name}, {profile.age}</Text>
           {profile.age_verified && <Text style={styles.verifiedBadge}>✓ Verified</Text>}
         </View>
+        {profile.distance_label && <Text style={styles.distance}>📍 {profile.distance_label}</Text>}
         <Text style={styles.bio}>{profile.bio}</Text>
         <View style={styles.interestsWrap}>
           {(profile.interests || []).map((i) => (
@@ -341,6 +380,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold, fontSize: 11, color: COLORS.success, backgroundColor: COLORS.successLight,
     borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
   },
+  distance: { fontFamily: FONTS.medium, fontSize: 13, color: COLORS.teal, marginTop: 4 },
   bio: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, marginTop: 6, marginBottom: 10 },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { backgroundColor: COLORS.tealLight, borderRadius: 16, paddingVertical: 5, paddingHorizontal: 10, borderWidth: 1, borderColor: COLORS.tealBorder },

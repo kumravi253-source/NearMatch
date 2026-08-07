@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Quicksand_400Regular, Quicksand_500Medium, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import { supabase } from './src/lib/supabase';
-import { AGE_ATTESTATION_TEXT } from './src/lib/legal';
+import { requestAndSaveLocation } from './src/lib/location';
+import { AGE_ATTESTATION_TEXT, DPDP_CONSENT_TEXT } from './src/lib/legal';
 import { COLORS, FONTS } from './src/theme/theme';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
@@ -13,9 +14,11 @@ import SwipeScreen from './src/screens/swipe/SwipeScreen';
 import MatchesScreen from './src/screens/matches/MatchesScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import VerifyAgeScreen from './src/screens/verify/VerifyAgeScreen';
+import LikesScreen from './src/screens/likes/LikesScreen';
 
 const TABS = [
   { key: 'swipe', label: 'Discover', icon: '🔥' },
+  { key: 'likes', label: 'Likes', icon: '💫' },
   { key: 'matches', label: 'Matches', icon: '💛' },
   { key: 'chat', label: 'Chat', icon: '💬' },
 ];
@@ -35,6 +38,8 @@ export default function App() {
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [showVerifyAge, setShowVerifyAge] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
+  const locationRequestedRef = useRef(false);
+  const pendingReferralCodeRef = useRef(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session ?? null));
@@ -87,7 +92,52 @@ export default function App() {
           console.error('Failed to record age attestation', error);
         }
       });
+    // Same idea, but for DPDP Act 2023 consent to data processing —
+    // a separate durable record from the age attestation above, since
+    // they're distinct legal requirements.
+    supabase
+      .from('dpdp_consents')
+      .insert({ user_id: session.user.id, consent_text: DPDP_CONSENT_TEXT })
+      .then(({ error }) => {
+        if (error && error.code !== '23505') {
+          console.error('Failed to record DPDP consent', error);
+        }
+      });
+    // If the signup form had a referral code typed in, record it once.
+    // record_referral is a one-shot per account server-side (unique on
+    // referred_id) regardless, but clearing the ref means a re-login
+    // on the same device doesn't even bother trying again.
+    if (pendingReferralCodeRef.current) {
+      const code = pendingReferralCodeRef.current;
+      pendingReferralCodeRef.current = null;
+      supabase.rpc('record_referral', { p_referral_code: code }).then(({ error }) => {
+        if (error) {
+          console.error('Failed to record referral', error);
+        }
+      });
+    }
+    // Launch promo: first 300 signups on or after launch get 15 days
+    // of free Premium. The function itself enforces the date and the
+    // 300-slot cap server-side and just no-ops (returns false) outside
+    // those conditions, so it's safe to call unconditionally here too.
+    supabase.rpc('claim_launch_promo').then(({ error }) => {
+      if (error) {
+        console.error('Failed to claim launch promo', error);
+      }
+    });
   }, [session]);
+
+  useEffect(() => {
+    // Fires once per app session, the first time we have both a
+    // session and a completed profile — covers brand-new signups and
+    // existing users alike (existing users won't have a
+    // profile_locations row yet either, so this backfills them on
+    // their next open). requestAndSaveLocation no-ops silently on
+    // denial, so this is safe to call unconditionally.
+    if (!session || !profile || locationRequestedRef.current) return;
+    locationRequestedRef.current = true;
+    requestAndSaveLocation(session.user.id);
+  }, [session, profile]);
 
   const handleProfileComplete = (savedProfile) => {
     setProfile(savedProfile);
@@ -120,7 +170,15 @@ export default function App() {
 
   if (session === null) {
     if (splashScreen === 'auth') {
-      return <AuthScreen initialMode={authMode} onBack={() => setSplashScreen('splash')} onSuccess={() => {}} />;
+      return (
+        <AuthScreen
+          initialMode={authMode}
+          onBack={() => setSplashScreen('splash')}
+          onSuccess={(_mode, referralCode) => {
+            if (referralCode) pendingReferralCodeRef.current = referralCode;
+          }}
+        />
+      );
     }
     return (
       <View style={styles.splash}>
@@ -168,7 +226,11 @@ export default function App() {
             isAgeVerified={profile.age_verified}
             onVerifyAge={() => setShowVerifyAge(true)}
             onEditProfile={() => setEditingProfile(true)}
+            referralCode={profile.referral_code}
           />
+        </View>
+        <View style={tab === 'likes' ? styles.tabPane : styles.tabPaneHidden}>
+          <LikesScreen active={tab === 'likes'} />
         </View>
         <View style={tab === 'matches' ? styles.tabPane : styles.tabPaneHidden}>
           <MatchesScreen userId={session.user.id} active={tab === 'matches'} onOpenChat={handleOpenChat} />
