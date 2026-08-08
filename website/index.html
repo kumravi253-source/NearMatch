@@ -20,7 +20,19 @@
 
 <nav class="nav">
   <div class="nav-inner">
-    <a href="index.html" class="nav-logo">NearMatch</a>
+    <a href="index.html" class="nav-logo">
+      <svg class="brand-mark" width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 2C7.58 2 4 5.64 4 10.2C4 16.5 12 22 12 22C12 22 20 16.5 20 10.2C20 5.64 16.42 2 12 2Z" fill="url(#brandMarkGrad)"/>
+        <path d="M12 13.3C12 13.3 8.6 11.28 8.6 9.06C8.6 7.94 9.5 7.13 10.55 7.13C11.15 7.13 11.73 7.4 12 7.84C12.27 7.4 12.85 7.13 13.45 7.13C14.5 7.13 15.4 7.94 15.4 9.06C15.4 11.28 12 13.3 12 13.3Z" fill="#FFFFFF"/>
+        <defs>
+          <linearGradient id="brandMarkGrad" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#E8603A"/>
+            <stop offset="1" stop-color="#C44C29"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>NearMatch</span>
+    </a>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#safety">Trust &amp; Safety</a>
@@ -55,6 +67,10 @@
 </section>
 
 <header class="hero">
+  <video class="hero-bg-video" autoplay muted loop playsinline poster="assets/hero-poster.jpg">
+    <source src="assets/hero-bg.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
   <div class="container hero-grid">
     <div>
       <span class="eyebrow">🌸 Coming soon to iOS &amp; Android</span>
@@ -343,7 +359,19 @@
   <div class="container">
     <div class="footer-grid">
       <div>
-        <div class="footer-logo">NearMatch</div>
+        <div class="footer-logo">
+          <svg class="brand-mark" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2C7.58 2 4 5.64 4 10.2C4 16.5 12 22 12 22C12 22 20 16.5 20 10.2C20 5.64 16.42 2 12 2Z" fill="url(#brandMarkGradFooter)"/>
+            <path d="M12 13.3C12 13.3 8.6 11.28 8.6 9.06C8.6 7.94 9.5 7.13 10.55 7.13C11.15 7.13 11.73 7.4 12 7.84C12.27 7.4 12.85 7.13 13.45 7.13C14.5 7.13 15.4 7.94 15.4 9.06C15.4 11.28 12 13.3 12 13.3Z" fill="#FFFFFF"/>
+            <defs>
+              <linearGradient id="brandMarkGradFooter" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#E8603A"/>
+                <stop offset="1" stop-color="#C44C29"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>NearMatch</span>
+        </div>
         <p class="footer-tagline">Warm connections, just around the corner. Built with real safety at the core, not bolted on after.</p>
       </div>
       <div class="footer-cols">
