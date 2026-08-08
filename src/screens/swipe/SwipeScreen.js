@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, StyleSheet, Animated, PanResponder,
+  View, Text, StyleSheet, Animated, PanResponder, AccessibilityInfo,
   Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -16,7 +16,14 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
   const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
   const position = useRef(new Animated.ValueXY()).current;
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotionEnabled);
+    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotionEnabled);
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +54,10 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
   }, [userId]);
 
   const resetPosition = () => {
+    if (reduceMotionEnabled) {
+      position.setValue({ x: 0, y: 0 });
+      return;
+    }
     Animated.spring(position, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
   };
 
@@ -54,11 +65,7 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
     const profile = profiles[index];
     if (!profile) return;
 
-    Animated.timing(position, {
-      toValue: { x: direction * SCREEN_WIDTH * 1.5, y: 0 },
-      duration: 250,
-      useNativeDriver: false,
-    }).start(async () => {
+    const afterSwipe = async () => {
       position.setValue({ x: 0, y: 0 });
       setIndex((i) => i + 1);
 
@@ -96,7 +103,18 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
       if (data?.matched) {
         Alert.alert("It's a match! 🎉", `You and ${profile.name} liked each other.`);
       }
-    });
+    };
+
+    if (reduceMotionEnabled) {
+      afterSwipe();
+      return;
+    }
+
+    Animated.timing(position, {
+      toValue: { x: direction * SCREEN_WIDTH * 1.5, y: 0 },
+      duration: 250,
+      useNativeDriver: false,
+    }).start(afterSwipe);
   };
 
   const handleAccountMenu = () => {
