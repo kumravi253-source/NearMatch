@@ -253,6 +253,27 @@
     margin-top: 16px;
   }
 
+  .plan-price-original {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    margin-bottom: 10px;
+  }
+  .plan-badge-alt { background: var(--teal); }
+  .independence-banner {
+    max-width: 860px;
+    margin: 0 auto 8px;
+    text-align: center;
+    background: linear-gradient(90deg, var(--coral-light), var(--teal-light));
+    border: 1.5px solid var(--coral-border);
+    border-radius: 16px;
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-family: var(--font-medium);
+  }
+  .independence-banner strong { color: var(--coral); }
+
   @media (max-width: 600px) {
     .refer-section { padding: 36px 20px; }
     .modal { padding: 28px 20px; }
@@ -277,15 +298,16 @@
 <!-- Hero -->
 <section class="pricing-hero">
   <div class="container">
-    <span class="eyebrow">Simple pricing</span>
-    <h1>Find love without <span class="accent">limits</span></h1>
-    <p>Start free. Upgrade when you're ready. No hidden fees, no dark patterns.</p>
+    <span class="eyebrow">🇮🇳 Independence Day Offer</span>
+    <h1>Lock in launch pricing <span class="accent">today</span></h1>
+    <p>Pay once now at Independence Day pricing — Premium activates the moment we launch on September 1, 2026. Prices go up after that, so this is the cheapest NearMatch will ever be.</p>
   </div>
 </section>
 
 <!-- Plans -->
 <section style="padding: 0 0 64px;">
   <div class="container">
+    <div class="independence-banner">🎉 <strong>Independence Day Offer</strong> — pay once now, Premium unlocks automatically the moment NearMatch launches on Sep 1, 2026. All plans below are one-time payments — no auto-renewal, ever.</div>
     <div class="plans-grid">
 
       <!-- Free -->
@@ -307,13 +329,13 @@
         <div class="coming-soon-note">🚀 Available at app launch</div>
       </div>
 
-      <!-- Premium Monthly -->
-      <div class="plan-card featured">
-        <div class="plan-badge">Most Popular</div>
-        <div class="plan-name">Premium</div>
-        <div class="plan-desc">The full NearMatch experience</div>
-        <div class="plan-price">₹299 <span>/ mo</span></div>
-        <div class="plan-per">billed monthly</div>
+      <!-- Premium 1-Month -->
+      <div class="plan-card">
+        <div class="plan-name">Premium — 1 Month</div>
+        <div class="plan-desc">Try full Premium at launch pricing</div>
+        <div class="plan-price">₹399 <span>/ 1 mo</span></div>
+        <div class="plan-price-original">₹599 after launch</div>
+        <div class="plan-per">one-time payment</div>
         <ul class="plan-features">
           <li><span class="check">✓</span> Unlimited likes</li>
           <li><span class="check">✓</span> See who liked you</li>
@@ -321,27 +343,48 @@
           <li><span class="check">✓</span> Real-time chat with matches</li>
           <li><span class="check">✓</span> AI age verification badge</li>
           <li><span class="check">✓</span> Block &amp; report</li>
-          <li><span class="check">✓</span> Cancel anytime</li>
+          <li><span class="check">✓</span> One-time payment — no auto-renewal</li>
         </ul>
-        <button class="btn-plan btn-plan-primary" onclick="openModal('monthly')">Subscribe — ₹299/mo</button>
-        <div class="coming-soon-note">🚀 Available at app launch</div>
+        <button class="btn-plan btn-plan-primary" onclick="openModal('month1')">Claim Offer — ₹399</button>
+        <div class="coming-soon-note">🚀 Premium activates at launch (Sep 1, 2026)</div>
       </div>
 
-      <!-- Premium 3-Month -->
-      <div class="plan-card">
-        <div class="plan-name">Premium 3-Month</div>
-        <div class="plan-desc">Best value for serious daters</div>
-        <div class="plan-price">₹499 <span>/ 3 mo</span></div>
-        <div class="plan-per">one-time payment</div>
-        <div class="plan-savings">Save ₹398 vs monthly</div>
+      <!-- Premium 2-Month -->
+      <div class="plan-card featured">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Premium — 2 Months</div>
+        <div class="plan-desc">The best balance of savings and flexibility</div>
+        <div class="plan-price">₹599 <span>/ 2 mo</span></div>
+        <div class="plan-price-original">₹699 after launch</div>
+        <div class="plan-per">one-time payment • ₹300/mo</div>
+        <div class="plan-savings">Save ₹199 vs buying monthly</div>
         <ul class="plan-features">
           <li><span class="check">✓</span> Everything in Premium</li>
-          <li><span class="check">✓</span> 3 full months of access</li>
-          <li><span class="check">✓</span> Best per-month value (₹166/mo)</li>
+          <li><span class="check">✓</span> 2 full months of access</li>
           <li><span class="check">✓</span> Priority support</li>
+          <li><span class="check">✓</span> One-time payment — no auto-renewal</li>
         </ul>
-        <button class="btn-plan btn-plan-primary" onclick="openModal('quarterly')">Get 3 Months — ₹499</button>
-        <div class="coming-soon-note">🚀 Available at app launch</div>
+        <button class="btn-plan btn-plan-primary" onclick="openModal('month2')">Claim Offer — ₹599</button>
+        <div class="coming-soon-note">🚀 Premium activates at launch (Sep 1, 2026)</div>
+      </div>
+
+      <!-- Premium 5-Month -->
+      <div class="plan-card">
+        <div class="plan-badge plan-badge-alt">Best Value</div>
+        <div class="plan-name">Premium — 5 Months</div>
+        <div class="plan-desc">Best value for serious daters</div>
+        <div class="plan-price">₹699 <span>/ 5 mo</span></div>
+        <div class="plan-price-original">₹999 after launch</div>
+        <div class="plan-per">one-time payment • ₹140/mo</div>
+        <div class="plan-savings">Save ₹1,296 vs buying monthly</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Everything in Premium</li>
+          <li><span class="check">✓</span> 5 full months of access</li>
+          <li><span class="check">✓</span> Priority support</li>
+          <li><span class="check">✓</span> One-time payment — no auto-renewal</li>
+        </ul>
+        <button class="btn-plan btn-plan-primary" onclick="openModal('month5')">Claim Offer — ₹699</button>
+        <div class="coming-soon-note">🚀 Premium activates at launch (Sep 1, 2026)</div>
       </div>
 
     </div>
@@ -361,23 +404,32 @@
           <tr>
             <th>Feature</th>
             <th>Free</th>
-            <th class="highlight">Premium Monthly</th>
-            <th>Premium 3-Month</th>
+            <th>1 Month</th>
+            <th class="highlight">2 Months</th>
+            <th>5 Months</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>Daily likes</td><td>10</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
-          <tr><td>Real-time chat</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          <tr><td>AI age verification</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          <tr><td>Block &amp; report</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          <tr><td>See who liked you</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          <tr><td>Priority in discovery</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-          <tr><td>Priority support</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+          <tr><td>Daily likes</td><td>10</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+          <tr><td>Real-time chat</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>AI age verification</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>Block &amp; report</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>See who liked you</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>Priority in discovery</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><td>Priority support</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td><td class="yes">✓</td></tr>
           <tr>
-            <td>Price</td>
+            <td>Independence Day price</td>
             <td>Free</td>
-            <td class="yes">₹299/month</td>
-            <td class="yes">₹499 for 3 months</td>
+            <td class="yes">₹399</td>
+            <td class="yes">₹599</td>
+            <td class="yes">₹699</td>
+          </tr>
+          <tr>
+            <td>Price after launch</td>
+            <td>Free</td>
+            <td>₹599</td>
+            <td>₹699</td>
+            <td>₹999</td>
           </tr>
         </tbody>
       </table>
@@ -520,9 +572,10 @@
   const RAZORPAY_KEY_ID = 'rzp_test_THO6hbvTeDxY4D';
 
   const PLANS = {
-    monthly:   { name: 'Premium Monthly',   amount: 29900,  display: '₹299',       desc: '1 month of Premium access' },
-    quarterly: { name: 'Premium 3-Month',   amount: 49900,  display: '₹499',       desc: '3 months of Premium access' },
-    free:      { name: 'Free Plan',          amount: 0,      display: '₹0',         desc: 'Basic free access' },
+    month1: { name: 'Premium — 1 Month',  amount: 39900, display: '₹399', desc: '1 month of Premium access at Independence Day pricing' },
+    month2: { name: 'Premium — 2 Months', amount: 59900, display: '₹599', desc: '2 months of Premium access at Independence Day pricing' },
+    month5: { name: 'Premium — 5 Months', amount: 69900, display: '₹699', desc: '5 months of Premium access at Independence Day pricing' },
+    free:   { name: 'Free Plan',          amount: 0,     display: '₹0',   desc: 'Basic free access' },
   };
 
   let currentPlan = null;

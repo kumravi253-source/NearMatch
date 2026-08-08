@@ -19,18 +19,20 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const PLAN_AMOUNTS: Record<string, number> = {
-  monthly: 29900, // paise
-  quarterly: 49900,
+  month1: 39900, // paise — Independence Day price, 1 month
+  month2: 59900, // paise — Independence Day price, 2 months
+  month5: 69900, // paise — Independence Day price, 5 months
 };
 
 const PLAN_DURATION_DAYS: Record<string, number> = {
-  monthly: 30,
-  quarterly: 90,
+  month1: 30,
+  month2: 60,
+  month5: 150,
 };
 
-// ₹299 / 30 days, rounded — used to convert leftover wallet balance
+// ₹399 / 30 days, rounded — used to convert leftover wallet balance
 // into extra subscription days at redemption time.
-const DAILY_RATE_PAISE = 997;
+const DAILY_RATE_PAISE = 1330;
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",

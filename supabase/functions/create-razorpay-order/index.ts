@@ -4,8 +4,9 @@ const SUPABASE_URL              = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const PLAN_AMOUNTS: Record<string, number> = {
-  monthly:   29900, // ₹299 in paise
-  quarterly: 49900, // ₹499 in paise
+  month1: 39900, // ₹399 in paise — Independence Day price, 1 month
+  month2: 59900, // ₹599 in paise — Independence Day price, 2 months
+  month5: 69900, // ₹699 in paise — Independence Day price, 5 months
 };
 
 // Anonymous website checkout — no NearMatch login, so requests only ever
