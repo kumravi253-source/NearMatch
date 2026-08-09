@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ScrollView, KeyboardAvoidingView, Platform, Alert, Image, ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
+import { withSignedPhotoUrl } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
 
 const INTEREST_OPTIONS = [
@@ -19,13 +20,30 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
   const isEditMode = !!existingProfile;
   const [avatar, setAvatar] = useState(existingProfile?.avatar_emoji || AVATAR_OPTIONS[0]);
   const [photoUri, setPhotoUri] = useState(null);
-  const [existingPhotoUrl, setExistingPhotoUrl] = useState(existingProfile?.photo_url || null);
+  // The stored value is an object path in a private bucket. Keep the path for
+  // saving, and a separately-minted signed URL for rendering the preview.
+  const [existingPhotoPath, setExistingPhotoPath] = useState(existingProfile?.photo_url || null);
+  const [existingPhotoUrl, setExistingPhotoUrl] = useState(null);
   const [name, setName] = useState(existingProfile?.name || '');
   const [age, setAge] = useState(existingProfile?.age ? String(existingProfile.age) : '');
   const [gender, setGender] = useState(existingProfile?.gender || '');
   const [bio, setBio] = useState(existingProfile?.bio || '');
   const [interests, setInterests] = useState(existingProfile?.interests || []);
   const [saving, setSaving] = useState(false);
+
+  // Mint a signed URL for the existing photo so the preview renders. Cancelled
+  // on unmount so a slow round trip can't set state on a gone component.
+  useEffect(() => {
+    if (!existingPhotoPath) {
+      setExistingPhotoUrl(null);
+      return;
+    }
+    let cancelled = false;
+    withSignedPhotoUrl({ photo_url: existingPhotoPath }).then((signed) => {
+      if (!cancelled) setExistingPhotoUrl(signed?.photo_url ?? null);
+    });
+    return () => { cancelled = true; };
+  }, [existingPhotoPath]);
 
   const toggleInterest = (interest) => {
     setInterests((prev) =>
@@ -49,7 +67,8 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
     });
     if (!result.canceled && result.assets?.[0]?.uri) {
       setPhotoUri(result.assets[0].uri);
-      setExistingPhotoUrl(null);
+      // Clearing the path also clears the signed preview via the effect above.
+      setExistingPhotoPath(null);
     }
   };
 
@@ -61,8 +80,10 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
       .from('avatars')
       .upload(path, arrayBuffer, { contentType: 'image/jpeg', upsert: true });
     if (uploadError) throw uploadError;
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
-    return `${data.publicUrl}?v=${Date.now()}`;
+    // The bucket is private, so store the object path — a signed URL is minted
+    // at render time instead. No cache-buster needed: signed URLs are unique
+    // per mint, so an overwritten photo can't be served from a stale cache.
+    return path;
   };
 
   const handleContinue = async () => {
@@ -82,7 +103,7 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
 
     setSaving(true);
     try {
-      let photoUrl = existingPhotoUrl;
+      let photoUrl = existingPhotoPath;
       if (photoUri) {
         photoUrl = await uploadPhoto();
       }
@@ -131,7 +152,7 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
             )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.photoBtn} onPress={handlePickPhoto}>
-            <Text style={styles.photoBtnText}>{photoUri || existingPhotoUrl ? 'Change Photo' : 'Add Photo'}</Text>
+            <Text style={styles.photoBtnText}>{photoUri || existingPhotoPath ? 'Change Photo' : 'Add Photo'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -140,7 +161,7 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
           {AVATAR_OPTIONS.map((a) => (
             <TouchableOpacity
               key={a}
-              style={[styles.avatarBtn, !photoUri && !existingPhotoUrl && avatar === a && styles.avatarBtnActive]}
+              style={[styles.avatarBtn, !photoUri && !existingPhotoPath && avatar === a && styles.avatarBtnActive]}
               onPress={() => { setAvatar(a); setPhotoUri(null); setExistingPhotoUrl(null); }}
             >
               <Text style={styles.avatarEmoji}>{a}</Text>

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../../lib/supabase';
+import { withSignedPhotoUrls } from '../../lib/avatars';
 import { getPremiumStatus, getWalletBalancePaise, formatPaiseAsRupees } from '../../lib/premium';
 import { COLORS, FONTS } from '../../theme/theme';
 
@@ -41,7 +42,9 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
         console.error('Failed to load candidates', candidatesError);
         setProfiles([]);
       } else {
-        setProfiles(candidates || []);
+        const signed = await withSignedPhotoUrls(candidates || []);
+        if (cancelled) return;
+        setProfiles(signed);
       }
       setIndex(0);
       setLoading(false);

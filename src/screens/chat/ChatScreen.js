@@ -4,6 +4,7 @@ import {
   TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
 
 const REPORT_REASONS = [
@@ -62,7 +63,8 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
       blockedWith.add(b.blocker_id === userId ? b.blocked_id : b.blocker_id);
     });
 
-    const profileById = new Map((profiles || []).map((p) => [p.id, p]));
+    const signedProfiles = await withSignedPhotoUrls(profiles || []);
+    const profileById = new Map(signedProfiles.map((p) => [p.id, p]));
     const lastMessageByMatch = new Map();
     (lastMessages || []).forEach((m) => {
       if (!lastMessageByMatch.has(m.match_id)) lastMessageByMatch.set(m.match_id, m.body);

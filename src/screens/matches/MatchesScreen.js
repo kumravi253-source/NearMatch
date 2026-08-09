@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
 
 export default function MatchesScreen({ userId, active, onOpenChat }) {
@@ -44,7 +45,8 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
       blockedWith.add(b.blocker_id === userId ? b.blocked_id : b.blocker_id);
     });
 
-    const profileById = new Map((profiles || []).map((p) => [p.id, p]));
+    const signedProfiles = await withSignedPhotoUrls(profiles || []);
+    const profileById = new Map(signedProfiles.map((p) => [p.id, p]));
     const merged = matchRows
       .map((m) => {
         const otherId = m.user_a === userId ? m.user_b : m.user_a;
