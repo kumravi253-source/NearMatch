@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
 
 const PRICING_URL = 'https://nearmatch.in/pricing.html';
@@ -22,7 +23,7 @@ export default function LikesScreen({ active }) {
       return;
     }
     setPremiumRequired(false);
-    setLikes(data || []);
+    setLikes(await withSignedPhotoUrls(data || []));
   }, []);
 
   useEffect(() => {
