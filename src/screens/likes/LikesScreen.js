@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
 import { useScreenTopPadding } from '../../theme/layout';
-
-const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
 export default function LikesScreen({ active }) {
   const screenTopPadding = useScreenTopPadding();
@@ -68,11 +66,6 @@ export default function LikesScreen({ active }) {
           <Text style={styles.emptySubtext}>
             This is a Premium feature — upgrade to instantly see everyone who's already liked your profile, no more guessing.
           </Text>
-          {Platform.OS !== 'ios' && (
-            <TouchableOpacity style={styles.upgradeBtn} onPress={() => Linking.openURL(PRICING_URL)}>
-              <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </View>
     );
@@ -151,6 +144,4 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
   emptyText: { fontFamily: FONTS.bold, fontSize: 18, color: COLORS.textPrimary, marginBottom: 6, textAlign: 'center' },
   emptySubtext: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20 },
-  upgradeBtn: { marginTop: 20, backgroundColor: COLORS.coral, borderRadius: 16, paddingVertical: 13, paddingHorizontal: 28 },
-  upgradeBtnText: { fontFamily: FONTS.bold, fontSize: 14, color: COLORS.white },
 });
