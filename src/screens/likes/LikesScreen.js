@@ -3,10 +3,12 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndi
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScreenTopPadding } from '../../theme/layout';
 
 const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
 export default function LikesScreen({ active }) {
+  const screenTopPadding = useScreenTopPadding();
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [premiumRequired, setPremiumRequired] = useState(false);
@@ -49,7 +51,7 @@ export default function LikesScreen({ active }) {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, screenTopPadding]}>
         <Text style={styles.header}>Who Liked You 💫</Text>
         <ActivityIndicator size="large" color={COLORS.coral} style={{ marginTop: 40 }} />
       </View>
@@ -58,7 +60,7 @@ export default function LikesScreen({ active }) {
 
   if (premiumRequired) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, screenTopPadding]}>
         <Text style={styles.header}>Who Liked You 💫</Text>
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>👑</Text>
@@ -77,7 +79,7 @@ export default function LikesScreen({ active }) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <Text style={styles.header}>Who Liked You 💫</Text>
 
       {likes.length === 0 ? (
@@ -119,7 +121,7 @@ export default function LikesScreen({ active }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center', marginBottom: 16 },
   list: { paddingHorizontal: 16, paddingBottom: 20 },
   row: { gap: 12, marginBottom: 12 },

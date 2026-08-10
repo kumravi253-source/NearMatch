@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndi
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScreenTopPadding } from '../../theme/layout';
 
 export default function MatchesScreen({ userId, active, onOpenChat }) {
+  const screenTopPadding = useScreenTopPadding();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -72,7 +74,7 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <Text style={styles.header}>Your Matches 💛</Text>
 
       {loading ? (
@@ -116,7 +118,7 @@ export default function MatchesScreen({ userId, active, onOpenChat }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center', marginBottom: 16 },
   list: { paddingHorizontal: 16, paddingBottom: 20 },
   row: { gap: 12, marginBottom: 12 },

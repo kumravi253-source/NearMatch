@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrl } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScrollPadding } from '../../theme/layout';
 
 const INTEREST_OPTIONS = [
   'Travel', 'Music', 'Movies', 'Foodie', 'Fitness', 'Art',
@@ -17,6 +18,7 @@ const AVATAR_OPTIONS = ['🙂', '😎', '🥳', '🌸', '🌻', '🦋'];
 const GENDER_OPTIONS = ['Man', 'Woman', 'Non-binary'];
 
 export default function ProfileSetupScreen({ userId, onComplete, existingProfile, onCancel }) {
+  const scrollPadding = useScrollPadding(60, 40);
   const isEditMode = !!existingProfile;
   const [avatar, setAvatar] = useState(existingProfile?.avatar_emoji || AVATAR_OPTIONS[0]);
   const [photoUri, setPhotoUri] = useState(null);
@@ -134,7 +136,7 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, scrollPadding]}>
         {onCancel && (
           <TouchableOpacity onPress={onCancel} style={styles.backBtn}>
             <Text style={styles.backText}>← Back</Text>
@@ -221,7 +223,7 @@ export default function ProfileSetupScreen({ userId, onComplete, existingProfile
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
-  scroll: { flexGrow: 1, padding: 24, paddingTop: 60, paddingBottom: 40 },
+  scroll: { flexGrow: 1, padding: 24 },
   title: { fontFamily: FONTS.bold, fontSize: 24, color: COLORS.textPrimary, textAlign: 'center', marginBottom: 4 },
   subtitle: { fontFamily: FONTS.medium, fontSize: 14, color: COLORS.teal, textAlign: 'center', marginBottom: 24 },
   label: { fontFamily: FONTS.bold, fontSize: 14, color: COLORS.teal, marginBottom: 10, marginTop: 4 },

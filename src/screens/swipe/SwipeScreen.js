@@ -8,12 +8,14 @@ import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { getPremiumStatus, getWalletBalancePaise, formatPaiseAsRupees } from '../../lib/premium';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScreenTopPadding } from '../../theme/layout';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
 const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
 export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge, onEditProfile, referralCode }) {
+  const screenTopPadding = useScreenTopPadding();
   const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -270,7 +272,7 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
   const nextProfile = profiles[index + 1];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <View style={styles.headerRow}>
         <View style={styles.headerSpacer} />
         <Text style={styles.header}>Discover 🌸</Text>
@@ -377,7 +379,7 @@ function ProfileCard({ profile }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center' },
   headerSpacer: { width: 80, alignItems: 'flex-end' },

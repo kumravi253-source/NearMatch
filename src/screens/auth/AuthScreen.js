@@ -6,8 +6,13 @@ import {
 import { supabase } from '../../lib/supabase';
 import { AGE_ATTESTATION_TEXT } from '../../lib/legal';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScrollPadding } from '../../theme/layout';
 
 export default function AuthScreen({ initialMode = 'login', onBack, onSuccess }) {
+  // The form is centred when it fits, but the signup variant is long enough
+  // to overflow on small screens — at which point it scrolls from the top
+  // and the back button would sit under the status bar without this.
+  const scrollPadding = useScrollPadding(24, 24);
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,7 +72,7 @@ export default function AuthScreen({ initialMode = 'login', onBack, onSuccess })
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={[styles.scroll, scrollPadding]}>
         {onBack && (
           <TouchableOpacity onPress={onBack} style={styles.backBtn}>
             <Text style={styles.backText}>← Back</Text>

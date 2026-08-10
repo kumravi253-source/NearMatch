@@ -5,8 +5,10 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../lib/supabase';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScreenTopPadding } from '../../theme/layout';
 
 export default function VerifyAgeScreen({ onDone }) {
+  const screenTopPadding = useScreenTopPadding();
   const [photo, setPhoto] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,7 +59,7 @@ export default function VerifyAgeScreen({ onDone }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <TouchableOpacity onPress={onDone} style={styles.backBtn}>
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
@@ -92,7 +94,7 @@ export default function VerifyAgeScreen({ onDone }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60, paddingHorizontal: 24 },
+  container: { flex: 1, backgroundColor: COLORS.bg, paddingHorizontal: 24 },
   backBtn: { marginBottom: 20 },
   backText: { fontFamily: FONTS.bold, fontSize: 16, color: COLORS.coral },
   title: { fontFamily: FONTS.bold, fontSize: 24, color: COLORS.textPrimary, textAlign: 'center', marginBottom: 8 },
