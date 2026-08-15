@@ -30,6 +30,17 @@ const PLAN_DURATION_DAYS: Record<string, number> = {
   month5: 150,
 };
 
+// The pricing page sells these plans before the app exists, on an explicit
+// promise: "Premium activates the moment we launch on September 1, 2026."
+// So a plan's clock starts at launch, not at payment — otherwise a pre-launch
+// buyer's month burns down against an app they cannot use yet, and a ₹399
+// "1 month" bought in mid-August would be most of the way gone by the time
+// there is anything to spend it on.
+//
+// Same instant as the launch gate in claim_launch_promo() and the website
+// countdown; keep the three in step if the date ever moves.
+const LAUNCH_AT = new Date("2026-09-01T00:00:00+05:30");
+
 // ₹399 / 30 days, rounded — used to convert leftover wallet balance
 // into extra subscription days at redemption time.
 const DAILY_RATE_PAISE = 1330;
@@ -163,7 +174,8 @@ Deno.serve(async (req) => {
 
   // 4. Grant Premium: insert the subscription (idempotent on
   // razorpay_payment_id — a retried request can't double-grant).
-  const startsAt = new Date();
+  const now = new Date();
+  const startsAt = now > LAUNCH_AT ? now : LAUNCH_AT;
   const durationDays = PLAN_DURATION_DAYS[plan];
   const expiresAt = new Date(startsAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
