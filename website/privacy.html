@@ -53,10 +53,11 @@
       <li><strong>Subscription status:</strong> if you purchase Premium, the plan, dates, and payment reference (not your card/UPI details — see Razorpay below). Other users only ever see a "Premium" badge, never your payment history.</li>
       <li><strong>Referral and wallet data:</strong> your unique referral code, who signed up using it, and your wallet credit balance and history.</li>
       <li><strong>Usage and diagnostics:</strong> how you use the app — screens opened, features used, crashes and errors, and general device and app-version information — collected through our analytics provider Vexo to help us fix problems and improve the app. This does not include your messages, your photos, or your exact location.</li>
+      <li><strong>Website visits:</strong> separately from the app, visiting nearmatch.in involves cookies and analytics that record your IP address, device and browser, and which pages you viewed. This applies to anyone who loads the site, with or without an account — see "Cookies and website analytics" below, including how to turn it off.</li>
     </ul>
 
     <h2>Website waitlist</h2>
-    <p>Separately from the app, you can join our launch waitlist on nearmatch.in without creating an account. This section covers that, and only that.</p>
+    <p>Separately from the app, you can join our launch waitlist on nearmatch.in without creating an account. This section covers the waitlist. Two other things happen on the website without an account, and each has its own section below: buying a Premium plan before launch ("Buying Premium on the website"), and the cookies and analytics that run when you load any page ("Cookies and website analytics").</p>
     <ul>
       <li><strong>What we collect:</strong> the email address you type into the waitlist form. Nothing else — no name, no phone number, no location, no tracking of who you are beyond what you enter.</li>
       <li><strong>Why:</strong> to email you once when NearMatch launches. We do not use waitlist details for advertising, we do not add you to a marketing list, and we do not sell or share them with anyone outside the providers named below.</li>
@@ -65,6 +66,25 @@
       <li><strong>How long we keep it:</strong> until six months after launch, or until you ask us to remove you — whichever comes first. After that the entry is deleted.</li>
       <li><strong>Removing yourself:</strong> email <a href="mailto:getsupport@nearmatch.in">getsupport@nearmatch.in</a> from the address you signed up with and we will delete your entry. You do not need an account, and you do not need to give a reason.</li>
     </ul>
+
+    <h2>Buying Premium on the website</h2>
+    <p>Before launch, you can buy a Premium plan on our pricing page without having an app account yet. This is a separate flow from the waitlist and collects more than it does.</p>
+    <ul>
+      <li><strong>What we collect:</strong> the name, email address, and phone number you type into the checkout form, plus the plan you chose and the resulting payment reference.</li>
+      <li><strong>Where it goes:</strong> these details are passed to <strong>Razorpay</strong> to open the checkout and take the payment, and the plan and payment reference are recorded in <strong>Supabase</strong> so that Premium can be activated for you. NearMatch never receives or stores your card, UPI, or bank details.</li>
+      <li><strong>Why we keep your email:</strong> a purchase made before you have an account is matched to your email address, so that Premium activates when you sign up in the app with that same address. If you never sign up, we keep the record so we can still honour or refund the purchase.</li>
+      <li><strong>Your consent:</strong> submitting the checkout form is your consent to the above. As with the waitlist, you are not creating an account by paying, and our <a href="terms.html">Terms of Service</a> apply to you once you sign up in the app. Refunds are governed by our <a href="refund.html">Refund &amp; Cancellation Policy</a>.</li>
+    </ul>
+
+    <h2>Cookies and website analytics</h2>
+    <p>The nearmatch.in website uses cookies and third-party requests. The NearMatch mobile app does not use cookies; its analytics are described under "Usage and diagnostics" above.</p>
+    <ul>
+      <li><strong>Google Analytics</strong> — most pages on nearmatch.in load Google Analytics, which sets cookies in your browser and sends Google your IP address, approximate location derived from it, device and browser information, and which pages you viewed. We use this only to understand how many people visit and which pages they read. These cookies are set when the page loads. You can block them using your browser's cookie settings, by browsing in private mode, or with Google's official <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener">Analytics opt-out add-on</a>; the site works normally without them.</li>
+      <li><strong>Google Fonts</strong> — every page loads its typefaces from Google's font service. This does not set cookies, but it does disclose your IP address to Google as part of the request.</li>
+      <li><strong>Razorpay</strong> — the pricing page loads Razorpay's checkout script so payment can happen in the page. Razorpay may set its own cookies for fraud prevention and to run the checkout, governed by Razorpay's own privacy policy.</li>
+      <li><strong>Essential requests</strong> — the waitlist and checkout forms send what you type to Supabase. No cookies are set for these; they are the requests that make the forms work at all.</li>
+    </ul>
+    <p>We do not use advertising cookies, we do not run retargeting or ad-network pixels, and we do not use cookies to build a profile of you across other websites.</p>
 
     <h2>How we use this information</h2>
     <ul>
@@ -82,8 +102,10 @@
       <li><strong>Face++ (Megvii)</strong> — processes the selfie image solely to estimate age during the optional verification step. The image is sent for this one check and is not stored by NearMatch.</li>
       <li><strong>Razorpay</strong> — processes your name, email, and phone number when you purchase a Premium subscription, and handles the payment itself. NearMatch never receives or stores your card, UPI, or bank details — Razorpay is a PCI DSS-compliant payment gateway that handles this directly.</li>
       <li><strong>Vexo</strong> — mobile app analytics. Receives usage information about how the app is used — screens opened, features tapped, crashes and errors, and general device and app-version information. It does not receive your messages, your photos, or your exact location. Analytics run in the released app only, not in development builds.</li>
+      <li><strong>Google</strong> — website only, in two separate roles. Google Analytics receives website visit information as described under "Cookies and website analytics" above. Google Fonts receives your IP address when a page loads its typefaces. Neither runs in the mobile app, and neither receives your profile, messages, photos, or app activity.</li>
+      <li><strong>Vercel</strong> — hosts the nearmatch.in website. Like any web host it receives the requests your browser makes, including your IP address, in order to serve the pages and to keep standard server logs. It does not receive anything you do inside the app.</li>
     </ul>
-    <p>Some of these providers process data outside India. In particular, if you use the optional age-verification step, your selfie is sent to <strong>Face++ (Megvii Technology)</strong>, which processes it outside India; Vexo also processes analytics data outside India. Where this happens, it is only for the purposes described above and only with providers bound to process the data on our instructions. What a provider does with data after it reaches them is additionally governed by that provider's own terms.</p>
+    <p>Several of these providers process data outside India. In particular, if you use the optional age-verification step, your selfie is sent to <strong>Face++ (Megvii Technology)</strong>, which processes it outside India; <strong>Vexo</strong> processes app analytics data, and <strong>Google</strong> and <strong>Vercel</strong> process website visit data, outside India as well. Where this happens, it is only for the purposes described above and only with providers bound to process the data on our instructions. What a provider does with data after it reaches them is additionally governed by that provider's own terms.</p>
     <p>We do not sell your personal information to third parties.</p>
 
     <h2>Other users can see</h2>
@@ -97,6 +119,7 @@
       <li>You can edit your profile information at any time within the app.</li>
       <li>You can block or report any user.</li>
       <li>You can permanently delete your account and all associated data yourself at any time from within the app (Discover → Delete Account) — no need to contact us. This removes your profile, matches, and messages immediately.</li>
+      <li>You can turn off website analytics cookies through your browser's cookie settings, by browsing in private mode, or with Google's Analytics opt-out add-on — see "Cookies and website analytics" above. The website works normally without them.</li>
     </ul>
 
     <h2>Your rights under India's Digital Personal Data Protection Act, 2023</h2>
@@ -104,12 +127,12 @@
     <ul>
       <li><strong>Access</strong> — request a summary of the personal data we hold about you and how it is processed.</li>
       <li><strong>Correction and updating</strong> — request correction of inaccurate or incomplete personal data. You can also edit most profile information directly in the app.</li>
-      <li><strong>Erasure</strong> — request deletion of your personal data. If you have an app account, you can delete it and all associated data yourself at any time (Discover → Delete Account). If you only joined the website waitlist, email <a href="mailto:getsupport@nearmatch.in">getsupport@nearmatch.in</a> and we will remove your entry.</li>
+      <li><strong>Erasure</strong> — request deletion of your personal data. If you have an app account, you can delete it and all associated data yourself at any time (Discover → Delete Account). If you have no account and only joined the website waitlist or bought a plan on the website, email <a href="mailto:getsupport@nearmatch.in">getsupport@nearmatch.in</a> and we will remove your entry, subject to any records we are required to keep for tax and accounting purposes.</li>
       <li><strong>Withdraw consent</strong> — withdraw consent for any processing you previously consented to, at any time, without affecting the lawfulness of processing carried out before withdrawal.</li>
       <li><strong>Grievance redressal</strong> — raise a grievance with our Grievance Officer (below) if you're unsatisfied with how your data is handled. If unresolved, you may escalate to the Data Protection Board of India.</li>
       <li><strong>Nominate</strong> — nominate another individual to exercise these rights on your behalf in the event of your death or incapacity.</li>
     </ul>
-    <p>By creating an account and accepting our <a href="terms.html">Terms of Service</a>, you consent to our processing of the personal data described in this Policy for the purposes described above. If you have only joined the website waitlist and have no account, your consent covers only the waitlist processing described in the "Website waitlist" section, and the rights above apply to that entry. Where the law requires a distinct, specific consent — for example, the optional age-verification selfie check — we ask for it separately in the app before that feature runs. To exercise any of the rights above, email <a href="mailto:getsupport@nearmatch.in">getsupport@nearmatch.in</a>; we will respond within the timelines required by law.</p>
+    <p>By creating an account and accepting our <a href="terms.html">Terms of Service</a>, you consent to our processing of the personal data described in this Policy for the purposes described above. If you have no account, your consent covers only what you actually did on the website — joining the waitlist, buying a plan before launch, or simply visiting — as described in the "Website waitlist", "Buying Premium on the website", and "Cookies and website analytics" sections, and the rights above apply to those records. Where the law requires a distinct, specific consent — for example, the optional age-verification selfie check — we ask for it separately in the app before that feature runs. To exercise any of the rights above, email <a href="mailto:getsupport@nearmatch.in">getsupport@nearmatch.in</a>; we will respond within the timelines required by law.</p>
 
     <h2>Grievance Officer</h2>
     <p>In accordance with the Information Technology Act, 2000, the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, and the Digital Personal Data Protection Act, 2023, the following person is designated as the Grievance Officer for NearMatch:</p>
