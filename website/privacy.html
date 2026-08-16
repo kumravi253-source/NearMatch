@@ -34,7 +34,7 @@
 
 <div class="container legal-page">
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: July 31, 2026</p>
+  <p class="updated">Last updated: August 16, 2026</p>
 
   <div class="legal-card">
     <p>This Privacy Policy explains what information NearMatch ("we", "us") collects when you use the NearMatch app or the nearmatch.in website, how we use it, and who we share it with. NearMatch is intended for users aged 18 and over.</p>
@@ -45,13 +45,14 @@
     <ul>
       <li><strong>Account information:</strong> the email address and password you sign up with.</li>
       <li><strong>Profile information:</strong> your name, age, gender, bio, interests, and avatar or profile photo.</li>
-      <li><strong>Verification data:</strong> if you choose to verify your age, a selfie you take is sent to our age-estimation provider for a single one-time check. <strong>We do not store this selfie.</strong> We store only the result of the check (pass/fail and an estimated age range) and the timestamp.</li>
+      <li><strong>Verification data:</strong> if you choose to verify your age, a selfie you take is sent to our age-estimation provider for a single one-time check. <strong>We do not store this selfie.</strong> We store only the result of the check (pass/fail and an estimated age range), the timestamp, and a record of the consent wording you were shown before the image was sent. The app asks for this consent separately, naming the provider, each time you attempt verification — see "Who we share data with" below.</li>
       <li><strong>Activity data:</strong> the swipes you make, the matches you form, and the messages you send.</li>
       <li><strong>Location:</strong> if you grant permission, your device's approximate coordinates, used to show you people nearby and sort matches by distance. <strong>Your exact coordinates are never shared with other users or stored anywhere they could read it</strong> — only a fuzzy range like "3-5 km away" is ever computed for another person to see. You can deny this permission and still use NearMatch; matching falls back to showing newer profiles first.</li>
       <li><strong>Safety reports:</strong> any blocks or reports you submit against other users, including the reason given.</li>
       <li><strong>Legal attestation:</strong> a timestamped record that you confirmed you are 18 or older at signup.</li>
       <li><strong>Subscription status:</strong> if you purchase Premium, the plan, dates, and payment reference (not your card/UPI details — see Razorpay below). Other users only ever see a "Premium" badge, never your payment history.</li>
       <li><strong>Referral and wallet data:</strong> your unique referral code, who signed up using it, and your wallet credit balance and history.</li>
+      <li><strong>Usage and diagnostics:</strong> how you use the app — screens opened, features used, crashes and errors, and general device and app-version information — collected through our analytics provider Vexo to help us fix problems and improve the app. This does not include your messages, your photos, or your exact location.</li>
     </ul>
 
     <h2>Website waitlist</h2>
@@ -80,8 +81,9 @@
       <li><strong>Supabase</strong> — our database, authentication, file storage, and real-time messaging infrastructure. Also stores website waitlist entries (email address only).</li>
       <li><strong>Face++ (Megvii)</strong> — processes the selfie image solely to estimate age during the optional verification step. The image is sent for this one check and is not stored by NearMatch.</li>
       <li><strong>Razorpay</strong> — processes your name, email, and phone number when you purchase a Premium subscription, and handles the payment itself. NearMatch never receives or stores your card, UPI, or bank details — Razorpay is a PCI DSS-compliant payment gateway that handles this directly.</li>
+      <li><strong>Vexo</strong> — mobile app analytics. Receives usage information about how the app is used — screens opened, features tapped, crashes and errors, and general device and app-version information. It does not receive your messages, your photos, or your exact location. Analytics run in the released app only, not in development builds.</li>
     </ul>
-    <p>Some of these providers process data outside India. Where that happens, it is only for the purposes described above and only with providers bound to process the data on our instructions.</p>
+    <p>Some of these providers process data outside India. In particular, if you use the optional age-verification step, your selfie is sent to <strong>Face++ (Megvii Technology)</strong>, which processes it outside India; Vexo also processes analytics data outside India. Where this happens, it is only for the purposes described above and only with providers bound to process the data on our instructions. What a provider does with data after it reaches them is additionally governed by that provider's own terms.</p>
     <p>We do not sell your personal information to third parties.</p>
 
     <h2>Other users can see</h2>

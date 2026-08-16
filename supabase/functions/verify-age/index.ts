@@ -1,10 +1,14 @@
 // Age verification via Face++ (Megvii FacePP) Detect API.
 //
 // Flow: the app captures a selfie in-app (expo-image-picker, front
-// camera) and posts the resulting base64 image here. This function —
-// and only this function — holds the Face++ API key/secret and calls
-// the Detect endpoint server-to-server. The mobile app never sees
-// those credentials.
+// camera) and posts the resulting base64 image here, together with the
+// consent wording it displayed. This function — and only this function
+// — holds the Face++ API key/secret and calls the Detect endpoint
+// server-to-server. The mobile app never sees those credentials.
+//
+// The consent is recorded here rather than client-side so that "consent
+// was logged before the image left the country" is enforced by control
+// flow instead of by convention.
 //
 // Face++ accepts the image as base64 directly, so no byte decoding is
 // needed here. We never persist the selfie ourselves — it's used for
@@ -24,6 +28,16 @@ const FACEPP_API_KEY = Deno.env.get("FACEPP_API_KEY");
 const FACEPP_API_SECRET = Deno.env.get("FACEPP_API_SECRET");
 const MIN_AGE = 18;
 const AGE_MARGIN = 5;
+const PROVIDER = "facepp";
+
+// Guards the consent record against a client sending something absurd. We
+// deliberately don't compare against a copy of the canonical string from
+// src/lib/legal.js: this runtime can't import that file, so a copy here would
+// drift, and an app version still in the wild would start failing verification
+// the moment the wording changed. Storing what the app actually displayed is
+// both more truthful as a record and less brittle.
+const MIN_CONSENT_LEN = 40;
+const MAX_CONSENT_LEN = 2000;
 
 async function detectAge(imageBase64: string) {
   if (!FACEPP_API_KEY || !FACEPP_API_SECRET) {
@@ -54,9 +68,31 @@ export default {
       return Response.json({ error: "not authenticated" }, { status: 401 });
     }
 
-    const { selfieImageBase64 } = await req.json();
+    const { selfieImageBase64, consentText } = await req.json();
     if (!selfieImageBase64) {
       return Response.json({ error: "missing selfieImageBase64" }, { status: 400 });
+    }
+
+    // The selfie is biometric data leaving the country to a named third party,
+    // so it does not travel on the blanket signup consent. No consent, no
+    // outbound call -- this check sits above the fetch deliberately.
+    const consent = typeof consentText === "string" ? consentText.trim() : "";
+    if (consent.length < MIN_CONSENT_LEN || consent.length > MAX_CONSENT_LEN) {
+      return Response.json({ error: "missing_consent" }, { status: 400 });
+    }
+
+    // Recorded before the image is sent, not after: if this insert fails we
+    // have no auditable record that consent was given, and sending anyway
+    // would be exactly the situation the record exists to rule out.
+    const { error: consentError } = await ctx.supabaseAdmin.from("biometric_consents").insert({
+      user_id: userId,
+      consent_text: consent,
+      provider: PROVIDER,
+    });
+
+    if (consentError) {
+      console.error("Failed to record biometric consent", consentError);
+      return Response.json({ error: "internal_error" }, { status: 500 });
     }
 
     let result;
@@ -85,7 +121,7 @@ export default {
 
     const { error: insertError } = await ctx.supabaseAdmin.from("age_verifications").insert({
       user_id: userId,
-      provider: "facepp",
+      provider: PROVIDER,
       passed,
       estimated_age_min: estimatedAge - AGE_MARGIN,
       estimated_age_max: estimatedAge + AGE_MARGIN,
