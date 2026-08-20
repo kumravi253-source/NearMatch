@@ -1,0 +1,10 @@
+# Header rules for the static site.
+#
+# This file is read by both Netlify and Cloudflare Pages, which use the same
+# syntax and both look for it in the publish/output directory (website/).
+# Keeping the rules here rather than in netlify.toml means the cache policy
+# survives the move to Cloudflare unchanged, and there is one source of truth
+# while both hosts are live during the cutover.
+
+/assets/*
+  Cache-Control: public, max-age=2592000
