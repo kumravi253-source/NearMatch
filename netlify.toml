@@ -3,12 +3,7 @@
   publish = "."
   command = ""
 
-# The hero video and poster are large and effectively immutable between
-# deploys. Netlify's default is max-age=0 + must-revalidate, so every repeat
-# visit spends a conditional request on them; video elements in particular
-# issue Range requests that revalidate poorly. 30 days is long enough to
-# matter and short enough that replacing an asset still propagates quickly.
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=2592000"
+# Header rules live in website/_headers, not here. Netlify reads that file
+# from the publish directory, and so does Cloudflare Pages, so the caching
+# policy for the large hero assets applies identically on both hosts during
+# the migration. Delete this whole file once Cloudflare is serving the site.
