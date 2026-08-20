@@ -71,9 +71,8 @@
 </section>
 
 <header class="hero">
-  <video class="hero-bg-video" autoplay muted loop playsinline poster="assets/hero-poster.jpg">
-    <source src="assets/hero-bg.mp4" type="video/mp4">
-  </video>
+  <video class="hero-bg-video" muted loop playsinline preload="none" aria-hidden="true"
+         poster="assets/hero-poster.jpg" data-src="assets/hero-bg.mp4"></video>
   <div class="hero-overlay"></div>
   <div class="container hero-grid">
     <div>
@@ -520,6 +519,44 @@
     }
   }
   loadCounterStatus();
+
+  // Hero background video — attached at runtime, never in the markup.
+  //
+  // hero-bg.mp4 is ~15 MB. As a plain autoplay <video> with a <source> in the
+  // HTML it downloaded on every single homepage hit, including from phones on
+  // mobile data and from crawlers, which is what exhausted the Netlify
+  // bandwidth allowance and got the site suspended on 2026-08-20. The poster
+  // is the video's first frame, so leaving the source off costs ~15 MB and
+  // loses almost nothing visually — the hero still renders as a still image.
+  //
+  // So: default to the poster, and only pay for the video when the browser
+  // tells us the connection can afford it.
+  (function () {
+    const video = document.querySelector('.hero-bg-video');
+    if (!video || !video.dataset.src) return;
+
+    const prefers = (q) => window.matchMedia && window.matchMedia(q).matches;
+
+    // Reduced motion and reduced data are both explicit "don't" signals.
+    if (prefers('(prefers-reduced-motion: reduce)')) return;
+    if (prefers('(prefers-reduced-data: reduce)')) return;
+
+    // The video is a wide decorative backdrop; on narrow screens it's mostly
+    // cropped away, and narrow screens are where metered data is likeliest.
+    if (window.innerWidth < 900) return;
+
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+      if (conn.saveData) return;
+      if (conn.effectiveType && conn.effectiveType !== '4g') return;
+    }
+
+    video.src = video.dataset.src;
+    const played = video.play();
+    // Autoplay can still be refused (power saving, platform policy). The
+    // poster is already on screen, so a rejection needs no fallback.
+    if (played && typeof played.catch === 'function') played.catch(() => {});
+  })();
 </script>
 </body>
 </html>
