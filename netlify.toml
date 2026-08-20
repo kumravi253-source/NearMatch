@@ -1,0 +1,9 @@
+[build]
+  base = "website"
+  publish = "."
+  command = ""
+
+# Header rules live in website/_headers, not here. Netlify reads that file
+# from the publish directory, and so does Cloudflare Pages, so the caching
+# policy for the large hero assets applies identically on both hosts during
+# the migration. Delete this whole file once Cloudflare is serving the site.
