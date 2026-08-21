@@ -23,6 +23,7 @@ these files.
 | 8 | [Security & health history](08-security-and-health-history.md) | The audit trail and recurring problems |
 | 9 | [Open items](09-open-items.md) | What is unresolved right now |
 | 10 | [Runbook](10-runbook.md) | How to run, build, and deploy it |
+| 11 | [Hosting migration](11-hosting-migration.md) | Everything needed to move the site to a new host |
 
 ## The 60-second version
 
