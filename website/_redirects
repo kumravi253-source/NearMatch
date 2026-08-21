@@ -1,0 +1,12 @@
+# Redirect rules for the static site.
+#
+# Read by Cloudflare Pages and Netlify from the publish directory, same as
+# _headers next to it. Vercel does NOT read this file -- it uses the
+# "redirects" key in vercel.json, which stays in place while Vercel is still
+# deploying this repo.
+#
+# Without this, both hostnames serve the site and split the canonical URL.
+# Netlify auto-redirects domain aliases to the primary domain; Cloudflare
+# Pages does not, so the rule has to be explicit here.
+
+https://www.nearmatch.in/*  https://nearmatch.in/:splat  301

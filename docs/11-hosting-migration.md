@@ -3,6 +3,12 @@
 Everything needed to serve nearmatch.in from a new host. Written 2026-08-21
 against the current `website/` directory.
 
+> **Decision (2026-08-21): Cloudflare Pages.** `website/_redirects` has been
+> added for www→apex, and `_headers` already works on Pages, so the publish
+> directory is ready. Two things remain that cannot be done from the repo:
+> disconnect the Cloudflare **Workers** integrations (§3a), and update the
+> Privacy Policy once Pages actually serves the apex (§6).
+
 ---
 
 ## 1. What you are deploying
@@ -92,13 +98,32 @@ Whether this matters depends on which host is actually serving the apex — see
 
 ### What each target host needs
 
-**Cloudflare Pages** — the stated destination:
+**Cloudflare Pages — chosen. The repo side is done:**
 - `_headers` works as-is ✅
-- `vercel.json` is ignored → **create `website/_redirects`**:
-  ```
-  https://www.nearmatch.in/*  https://nearmatch.in/:splat  301
-  ```
+- `website/_redirects` added ✅ (www→apex, 301)
+- `vercel.json` is ignored by Pages; left in place while Vercel still deploys
 - Delete `netlify.toml` once Cloudflare serves the apex (the file says so itself)
+
+Pages project settings: build command **empty**, output directory `website`,
+framework preset **None**. No config file in the repo is required.
+
+### 3a. ⚠️ Disconnect the Workers integrations first
+
+Cloudflare **Workers** — not Pages — is currently connected to this repo, on
+**two separate accounts**, both building a project named `nearmatch`:
+
+| Account | Build |
+|---|---|
+| `a7d3e08e73841636865c81ee932e6cd3` | `2a383caa` |
+| `7ecbdd0705f4dc1b64578bc1e7741acd` | `08875b8e` |
+
+Both fail instantly on every push, because Workers Builds needs a
+`wrangler.jsonc` declaring the assets directory and there is none in this repo.
+Pages does not need one — which is why Pages is the right fit for a static site.
+
+**Disconnect both Workers integrations** in the Cloudflare dashboard, then
+create a Pages project instead. Left connected, they will keep failing on every
+commit and posting duplicate comments.
 
 **Netlify:**
 - `_headers` works as-is ✅
