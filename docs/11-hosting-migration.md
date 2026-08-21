@@ -3,9 +3,9 @@
 Everything needed to serve nearmatch.in from a new host. Written 2026-08-21
 against the current `website/` directory.
 
-> **Decision (2026-08-21): Cloudflare Pages.** `website/_redirects` has been
-> added for www→apex, and `_headers` already works on Pages, so the publish
-> directory is ready. Two things remain that cannot be done from the repo:
+> **Decision (2026-08-21): Cloudflare Pages.** `_headers` works on Pages, so
+> the publish directory is ready. **www→apex is a zone-level Redirect Rule, not
+> a `_redirects` line** — see §3b. Two things remain that cannot be done from the repo:
 > disconnect the Cloudflare **Workers** integrations (§3a), and update the
 > Privacy Policy once Pages actually serves the apex (§6).
 
@@ -100,12 +100,34 @@ Whether this matters depends on which host is actually serving the apex — see
 
 **Cloudflare Pages — chosen. The repo side is done:**
 - `_headers` works as-is ✅
-- `website/_redirects` added ✅ (www→apex, 301)
+- `website/_redirects` present but carries **no active rules** — see §3b
 - `vercel.json` is ignored by Pages; left in place while Vercel still deploys
 - Delete `netlify.toml` once Cloudflare serves the apex (the file says so itself)
 
 Pages project settings: build command **empty**, output directory `website`,
 framework preset **None**. No config file in the repo is required.
+
+### 3b. www→apex is NOT done in `_redirects` on Pages
+
+Cloudflare Pages' `_redirects` matches **paths only**. A scheme+hostname source
+— `https://www.nearmatch.in/* https://nearmatch.in/:splat 301` — is **Netlify**
+syntax. Pages ignores it silently: no error, no warning, no redirect. The rule
+looks correct in the repo and does nothing in production, leaving both
+hostnames serving the site and splitting the canonical URL.
+
+Configure it at the zone level instead — **Rules → Redirect Rules**:
+
+| Field | Value |
+|---|---|
+| If | hostname **equals** `www.nearmatch.in` |
+| Then | dynamic redirect |
+| Expression | `concat("https://nearmatch.in", http.request.uri.path)` |
+| Status | 301 |
+| Query string | preserve |
+
+**Verify it after cutover** — `curl -I https://www.nearmatch.in` should return
+`301` with a `location:` header pointing at the apex. Do not assume it works
+because the file exists.
 
 ### 3a. ⚠️ Disconnect the Workers integrations first
 
@@ -225,12 +247,14 @@ host move.
 ## 8. Cutover checklist
 
 1. [ ] Create the project; publish directory `website/`, **no build command**
-2. [ ] Add the host-appropriate redirect file (§3) — `_redirects` for Cloudflare
+2. [ ] Create the www→apex **Redirect Rule** in the Cloudflare dashboard (§3b) —
+       *not* a `_redirects` line, which Pages ignores for hostname sources
 3. [ ] Confirm `/assets/*` returns `Cache-Control: public, max-age=2592000`
 4. [ ] Deploy to the host's preview URL and check all 7 pages render
 5. [ ] **Do not expect checkout to work on the preview URL** (§2)
 6. [ ] Point apex + www DNS at the new host; wait for TLS
 7. [ ] **Verify all seven pages on the real domain**, not just `/` (§4)
+7b. [ ] `curl -I https://www.nearmatch.in` → expect `301` to the apex (§3b)
 8. [ ] Test the waitlist form end to end
 9. [ ] Test a real Razorpay checkout — note issue #10, the pricing page is
        currently on a **test** key id, so settle that first
