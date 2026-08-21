@@ -280,3 +280,24 @@ host move.
 The site is `website/` in `kumravi253-source/NearMatch`. Either point the host
 at the repo (recommended — deploys on push), or copy the directory. It is 15 MB
 and self-contained; nothing else in the repo is needed to serve it.
+
+---
+
+## 10. If the host insists on a Node.js app
+
+Some hosts — Hostinger's *app hosting* product among them — will not accept a
+static upload at all. Their upload step validates the archive for a JavaScript
+framework and a `package.json`, and rejects anything else with *"Unsupported
+framework or invalid project structure"*. `website/` has neither, and the root
+`package.json` is the Expo mobile app, which has **no web build target** (see
+§7 of `docs/06-website-and-hosting.md`) — uploading it reproduces the same
+rejection.
+
+`deploy/node/` exists for that case: a minimal Express server that serves
+`website/` unchanged, with the www→apex, HTTPS and `/assets/*` cache rules
+reimplemented in code. Run `./deploy/node/build.sh` to produce the upload zip.
+Install command `npm install`, start command `npm start`, Node 18+.
+
+This is a fallback, not the recommendation. Plain **Web Hosting → File Manager
+→ `public_html`** with `website/` and its `.htaccess` is simpler and does the
+same job.
