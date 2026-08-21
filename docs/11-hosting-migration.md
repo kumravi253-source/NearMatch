@@ -3,9 +3,20 @@
 Everything needed to serve nearmatch.in from a new host. Written 2026-08-21
 against the current `website/` directory.
 
-> **Decision (2026-08-21): Cloudflare Pages.** `_headers` works on Pages, so
-> the publish directory is ready. **www→apex is a zone-level Redirect Rule, not
-> a `_redirects` line** — see §3b. Two things remain that cannot be done from the repo:
+> **Decision (2026-08-21, superseding an earlier Cloudflare Pages choice):
+> Hostinger shared Web Hosting.** Upload the site into `public_html`; Apache
+> config lives in `website/.htaccess`.
+>
+> Hostinger's *app hosting* product will not accept this site — it expects a
+> JavaScript framework and a `package.json`, and rejects a static site with
+> "Unsupported framework or invalid project structure". That is the wrong
+> product, not a problem with the site. Use **Web Hosting → File Manager →
+> `public_html`**.
+>
+> `.htaccess` is now the live config. `_headers`, `_redirects` and
+> `vercel.json` are Cloudflare/Netlify/Vercel formats that Apache ignores
+> entirely; they are kept only while those hosts are still connected, and the
+> Cloudflare notes below are retained for reference. Two things remain that cannot be done from the repo:
 > disconnect the Cloudflare **Workers** integrations (§3a), and update the
 > Privacy Policy once Pages actually serves the apex (§6).
 
