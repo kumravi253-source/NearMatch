@@ -6,6 +6,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScreenTopPadding } from '../../theme/layout';
 
 const REPORT_REASONS = [
   { label: 'Inappropriate photos', value: 'inappropriate_photos' },
@@ -16,6 +17,7 @@ const REPORT_REASONS = [
 ];
 
 export default function ChatScreen({ userId, active, selectedChatId, onSelectChat }) {
+  const screenTopPadding = useScreenTopPadding();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -115,7 +117,7 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <Text style={styles.header}>Messages 💬</Text>
 
       {loading ? (
@@ -161,6 +163,7 @@ export default function ChatScreen({ userId, active, selectedChatId, onSelectCha
 }
 
 function ConversationView({ userId, match, onBack, onBlocked }) {
+  const screenTopPadding = useScreenTopPadding();
   const [text, setText] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -265,7 +268,7 @@ function ConversationView({ userId, match, onBack, onBlocked }) {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[styles.container, screenTopPadding]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.convoHeader}>
         <TouchableOpacity onPress={onBack} style={styles.backBtn}>
           <Text style={styles.backText}>← Back</Text>
@@ -313,7 +316,7 @@ function ConversationView({ userId, match, onBack, onBlocked }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center', marginBottom: 16 },
   list: { paddingHorizontal: 16 },
   row: {

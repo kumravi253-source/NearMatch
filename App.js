@@ -3,12 +3,14 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { ObserveRoot, useObserve } from 'expo-observe';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Quicksand_400Regular, Quicksand_500Medium, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import { supabase } from './src/lib/supabase';
 import { requestAndSaveLocation } from './src/lib/location';
 import { AGE_ATTESTATION_TEXT, DPDP_CONSENT_TEXT } from './src/lib/legal';
 import { COLORS, FONTS } from './src/theme/theme';
+import { useTabBarPadding } from './src/theme/layout';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
 import SwipeScreen from './src/screens/swipe/SwipeScreen';
@@ -31,8 +33,9 @@ const TABS = [
   { key: 'chat', label: 'Chat', icon: '💬' },
 ];
 
-function App() {
+function AppContent() {
   const { markInteractive } = useObserve();
+  const tabBarPadding = useTabBarPadding();
   const [fontsLoaded] = useFonts({
     Pacifico_400Regular,
     Quicksand_400Regular,
@@ -263,7 +266,7 @@ function App() {
         </View>
       </View>
 
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, tabBarPadding]}>
         {TABS.map((t) => (
           <TouchableOpacity
             key={t.key}
@@ -294,7 +297,7 @@ const styles = StyleSheet.create({
   tabPaneHidden: { display: 'none' },
   tabBar: {
     flexDirection: 'row', borderTopWidth: 1, borderTopColor: COLORS.coralBorder,
-    backgroundColor: COLORS.card, paddingBottom: 22, paddingTop: 10,
+    backgroundColor: COLORS.card, paddingTop: 10,
   },
   tabBtn: { flex: 1, alignItems: 'center' },
   tabIcon: { fontSize: 20, opacity: 0.4 },
@@ -302,5 +305,16 @@ const styles = StyleSheet.create({
   tabLabel: { fontFamily: FONTS.medium, fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
   tabLabelActive: { fontFamily: FONTS.bold, color: COLORS.coral },
 });
+
+// SafeAreaProvider has to sit above every screen, since useSafeAreaInsets
+// reads from its context. ObserveRoot stays the outermost wrapper so the
+// expo-observe wiring is unchanged — useObserve is still called below it.
+function App() {
+  return (
+    <SafeAreaProvider>
+      <AppContent />
+    </SafeAreaProvider>
+  );
+}
 
 export default ObserveRoot.wrap(App);

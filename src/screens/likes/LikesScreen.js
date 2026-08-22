@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { COLORS, FONTS } from '../../theme/theme';
-
-const PRICING_URL = 'https://nearmatch.in/pricing.html';
+import { useScreenTopPadding } from '../../theme/layout';
 
 export default function LikesScreen({ active }) {
+  const screenTopPadding = useScreenTopPadding();
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [premiumRequired, setPremiumRequired] = useState(false);
@@ -49,7 +49,7 @@ export default function LikesScreen({ active }) {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, screenTopPadding]}>
         <Text style={styles.header}>Who Liked You 💫</Text>
         <ActivityIndicator size="large" color={COLORS.coral} style={{ marginTop: 40 }} />
       </View>
@@ -58,7 +58,7 @@ export default function LikesScreen({ active }) {
 
   if (premiumRequired) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, screenTopPadding]}>
         <Text style={styles.header}>Who Liked You 💫</Text>
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>👑</Text>
@@ -66,18 +66,13 @@ export default function LikesScreen({ active }) {
           <Text style={styles.emptySubtext}>
             This is a Premium feature — upgrade to instantly see everyone who's already liked your profile, no more guessing.
           </Text>
-          {Platform.OS !== 'ios' && (
-            <TouchableOpacity style={styles.upgradeBtn} onPress={() => Linking.openURL(PRICING_URL)}>
-              <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <Text style={styles.header}>Who Liked You 💫</Text>
 
       {likes.length === 0 ? (
@@ -119,7 +114,7 @@ export default function LikesScreen({ active }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center', marginBottom: 16 },
   list: { paddingHorizontal: 16, paddingBottom: 20 },
   row: { gap: 12, marginBottom: 12 },
@@ -149,6 +144,4 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 64, marginBottom: 16 },
   emptyText: { fontFamily: FONTS.bold, fontSize: 18, color: COLORS.textPrimary, marginBottom: 6, textAlign: 'center' },
   emptySubtext: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20 },
-  upgradeBtn: { marginTop: 20, backgroundColor: COLORS.coral, borderRadius: 16, paddingVertical: 13, paddingHorizontal: 28 },
-  upgradeBtnText: { fontFamily: FONTS.bold, fontSize: 14, color: COLORS.white },
 });

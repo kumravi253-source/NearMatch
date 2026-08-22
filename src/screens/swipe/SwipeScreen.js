@@ -1,19 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, Animated, PanResponder, AccessibilityInfo,
-  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert, Linking, Platform,
+  Dimensions, TouchableOpacity, Image, ActivityIndicator, Alert,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../../lib/supabase';
 import { withSignedPhotoUrls } from '../../lib/avatars';
 import { getPremiumStatus, getWalletBalancePaise, formatPaiseAsRupees } from '../../lib/premium';
 import { COLORS, FONTS } from '../../theme/theme';
+import { useScreenTopPadding } from '../../theme/layout';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
-const PRICING_URL = 'https://nearmatch.in/pricing.html';
 
 export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerifyAge, onEditProfile, referralCode }) {
+  const screenTopPadding = useScreenTopPadding();
   const [profiles, setProfiles] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -84,21 +85,17 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
         if (error.message?.includes('rate_limit_exceeded')) {
           Alert.alert("You're swiping fast!", 'Take a short break and try again in a minute.');
         } else if (error.message?.includes('daily_like_limit_reached')) {
-          // No purchase link on iOS: Apple's guidelines don't allow
-          // linking out to external payment for unlocking in-app
-          // features. Android keeps the link since Google's policy
-          // here is more permissive.
+          // No purchase link on either platform. Apple's guidelines
+          // don't allow linking out to external payment for unlocking
+          // in-app features, and Google's Payments policy says the same
+          // for India — its external payment links program covers Japan
+          // only. Premium is sold on the website, but the app must not
+          // route users there. Restore an in-app path once Google Play
+          // Billing is integrated.
           Alert.alert(
             "You've used today's 10 free likes",
-            Platform.OS === 'ios'
-              ? 'Free plan allows 10 likes per day. Come back tomorrow for more.'
-              : 'Upgrade to Premium for unlimited likes, or come back tomorrow.',
-            Platform.OS === 'ios'
-              ? [{ text: 'OK' }]
-              : [
-                  { text: 'Not now', style: 'cancel' },
-                  { text: 'Upgrade', onPress: () => Linking.openURL(PRICING_URL) },
-                ]
+            'Free plan allows 10 likes per day. Come back tomorrow for more.',
+            [{ text: 'OK' }]
           );
         }
         return;
@@ -145,7 +142,6 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
       `${isPremium ? "Unlimited likes, priority discovery, and you're visible in Who Liked You." : '10 likes/day. Upgrade for unlimited likes and to see who liked you.'}\n\n${walletLine}\n\nYour referral code: ${referralCode || '—'}\nShare it — friends who sign up with it earn you ₹100 each, with no limit.`,
       [
         { text: 'Copy referral code', onPress: () => referralCode && Clipboard.setStringAsync(referralCode) },
-        ...(isPremium || Platform.OS === 'ios' ? [] : [{ text: 'Upgrade to Premium', onPress: () => Linking.openURL(PRICING_URL) }]),
         { text: 'Close', style: 'cancel' },
       ]
     );
@@ -270,7 +266,7 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
   const nextProfile = profiles[index + 1];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, screenTopPadding]}>
       <View style={styles.headerRow}>
         <View style={styles.headerSpacer} />
         <Text style={styles.header}>Discover 🌸</Text>
@@ -377,7 +373,7 @@ function ProfileCard({ profile }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
   header: { fontFamily: FONTS.logo, fontSize: 26, color: COLORS.coral, textAlign: 'center' },
   headerSpacer: { width: 80, alignItems: 'flex-end' },
