@@ -156,4 +156,27 @@ runs.
 14 profiles vs 16 auth users as of 2026-08-09, plus one stale unconfirmed test
 account. Cosmetic, long-standing.
 
+---
+
+## 🟡 13. Two dead Cloudflare Workers integrations fail CI on every push
+
+Two Workers Git integrations were connected to this repository on 2026-08-21,
+one per Cloudflare account:
+
+- `a7d3e08e73841636865c81ee932e6cd3`
+- `7ecbdd0705f4dc1b64578bc1e7741acd`
+
+Both post a red `Workers Builds: nearmatch` check on every commit, on every
+branch including `main`. Nothing in the repo can make them pass: there is no
+`wrangler.toml`/`.json`/`.jsonc` anywhere in the tree, so a Workers build has
+no entrypoint. nearmatch.in is a static site — the matching Cloudflare product
+is **Pages**, not Workers.
+
+Harmless in itself, but it makes red CI the normal state of the repository,
+which is how a real failure gets missed.
+
+**Fix:** Cloudflare dashboard → Workers → `nearmatch` → Settings → Build →
+disconnect the Git repository, on both accounts. Dashboard-only; no code
+change can do it.
+
 [issue #10]: https://github.com/kumravi253-source/NearMatch/issues/10
