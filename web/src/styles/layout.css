@@ -1,0 +1,161 @@
+/* App shell.
+ *
+ * Two layouts, one breakpoint. Below --bp-desktop the app is a single column
+ * with a fixed bottom tab bar, matching the mobile app one-for-one. At and
+ * above it the tab bar becomes a left sidebar and the content gets a rail.
+ * Nothing in between: a tablet gets the mobile layout centred, because a
+ * half-width swipe deck reads worse than a phone-shaped one.
+ */
+
+.nm-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* main carries no padding of its own so the header can sit flush against the
+   top and span the full column width; the inner content div is what gets
+   inset. */
+.nm-shell__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  /* Clears the fixed tab bar plus the iOS home indicator. */
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+}
+
+.nm-shell__content {
+  flex: 1;
+  padding: var(--space-5) var(--space-4);
+}
+
+/* Panes that manage their own scrolling (the deck, a conversation) fill the
+   shell instead of being inset. */
+.nm-shell__content--flush {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---------- Tab bar (mobile) ---------- */
+.nm-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--coral-border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nm-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--tabbar-h);
+  padding: var(--space-2) 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+}
+.nm-tab__icon { font-size: 20px; line-height: 1; opacity: 0.4; }
+.nm-tab__label { font-size: 11px; font-weight: 600; }
+.nm-tab[aria-current='page'] { color: var(--coral); }
+.nm-tab[aria-current='page'] .nm-tab__icon { opacity: 1; }
+
+/* ---------- Header ---------- */
+.nm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--coral-border);
+  background: var(--card);
+}
+.nm-header__title { font-size: 20px; font-weight: 700; }
+
+/* ---------- Desktop ---------- */
+@media (min-width: 900px) {
+  .nm-shell { flex-direction: row; }
+
+  .nm-tabbar {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    align-self: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--space-1);
+    width: var(--sidebar-w);
+    height: 100dvh;
+    padding: var(--space-5) var(--space-3);
+    border-top: none;
+    border-right: 1px solid var(--coral-border);
+  }
+
+  .nm-tabbar__brand {
+    padding: 0 var(--space-3) var(--space-5);
+  }
+
+  .nm-tab {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    min-height: 48px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius);
+  }
+  .nm-tab:hover { background: var(--coral-light); }
+  .nm-tab[aria-current='page'] { background: var(--coral-light); }
+  .nm-tab__icon { font-size: 18px; }
+  .nm-tab__label { font-size: 15px; }
+
+  /* The sidebar is in flow at this width, so the column centres inside the
+     remaining space rather than under the sidebar. */
+  .nm-shell__main {
+    padding-bottom: 0;
+    margin-inline: auto;
+    height: 100dvh;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+/* The brand block is sidebar-only; on mobile the tab bar has no room for it
+   and each screen carries its own header instead. */
+.nm-tabbar__brand { display: none; }
+@media (min-width: 900px) { .nm-tabbar__brand { display: block; } }
+
+/* ---------- Centred single-column pages (splash, auth, setup) ---------- */
+.nm-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 440px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+}
+.nm-page--top { justify-content: flex-start; padding-top: var(--space-7); }
+.nm-page--wide { max-width: 560px; text-align: left; }
+.nm-page__tagline { color: var(--teal); font-weight: 500; font-size: 17px; }
+.nm-page__actions { width: 100%; display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.nm-page__fineprint { font-size: 12px; color: var(--text-secondary); }
