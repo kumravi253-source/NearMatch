@@ -66,12 +66,33 @@ the two are diffable.
 Pacifico is the wordmark face and is used nowhere else, exactly as on mobile
 and on the marketing site.
 
-## Two things to know before step 2
+## CORS on the Edge Functions
 
-**`verify-age` and `delete-account` send no CORS headers.** They were written
-for the mobile app, where CORS does not apply. A browser will fail the
-preflight. Both need `Access-Control-Allow-Origin` before age verification and
-account deletion can work here.
+Grepping the function sources for `Access-Control` finds nothing in
+`verify-age` and `delete-account`, which looks like they would fail a browser
+preflight. They do not. Both are wrapped in `withSupabase` from
+`@supabase/server`, whose `cors` option defaults to `'default'`: the wrapper
+answers `OPTIONS` with a 204 *before* authenticating, and appends CORS headers
+to every response the handler returns. The default set comes from
+`@supabase/supabase-js/cors`:
 
-**The app is `noindex`.** Everything past sign-in is somebody's dating
-profile. Only the marketing site at the document root should be indexed.
+    Access-Control-Allow-Origin:  *
+    Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+    Access-Control-Allow-Headers: authorization, x-client-info, apikey,
+                                  content-type, x-retry-count, traceparent,
+                                  tracestate, baggage
+
+So both functions are already callable from a browser, and no change is needed
+to use them here.
+
+Note the asymmetry with `create-razorpay-order` and
+`verify-razorpay-payment`, which are hand-rolled `Deno.serve` handlers and so
+carry their own explicit `CORS_HEADERS` — pinned to `https://nearmatch.in` on
+the order path. That is not an inconsistency to tidy up: the wrapper-supplied
+`*` is on endpoints that require a valid user JWT, which is sent as an explicit
+header rather than an ambient cookie, and `Allow-Credentials` is not set.
+
+## The app is noindex
+
+Everything past sign-in is somebody's dating profile. Only the marketing site
+at the document root should be indexed.
