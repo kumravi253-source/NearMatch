@@ -1,18 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, FONTS } from '../../theme/theme';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function NextFeatureScreen() {
+export default function NextFeatureScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Next Feature (Placeholder)</Text>
-      <Text style={styles.description}>This is a scaffolded placeholder screen for the next feature.</Text>
+      <Text style={styles.title}>Next Feature (WIP)</Text>
+      <Text style={styles.desc}>This is a scaffolded placeholder screen for the forthcoming feature.</Text>
+      <TouchableOpacity style={styles.btn} onPress={() => navigation?.goBack?.()}>
+        <Text style={styles.btnText}>Go Back</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: COLORS.bg },
-  title: { fontFamily: FONTS.bold, fontSize: 20, color: COLORS.coral, marginBottom: 8 },
-  description: { fontFamily: FONTS.regular, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
+  desc: { fontSize: 14, color: '#444', textAlign: 'center', marginBottom: 16 },
+  btn: { backgroundColor: '#ff6b6b', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 },
+  btnText: { color: '#fff', fontWeight: '700' },
 });
