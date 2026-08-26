@@ -16,7 +16,6 @@ import MatchesScreen from './src/screens/matches/MatchesScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import VerifyAgeScreen from './src/screens/verify/VerifyAgeScreen';
 import LikesScreen from './src/screens/likes/LikesScreen';
-import NextFeatureScreen from './src/screens/next/NextFeatureScreen';
 import { vexo } from 'vexo-analytics';
 
 // Initialize Vexo at module scope, before any component mounts. Guarded to
@@ -30,7 +29,6 @@ const TABS = [
   { key: 'likes', label: 'Likes', icon: '💫' },
   { key: 'matches', label: 'Matches', icon: '💛' },
   { key: 'chat', label: 'Chat', icon: '💬' },
-  { key: 'next', label: 'Next', icon: '✨' },
 ];
 
 function App() {
@@ -262,9 +260,6 @@ function App() {
             selectedChatId={selectedChatId}
             onSelectChat={setSelectedChatId}
           />
-        </View>
-        <View style={tab === 'next' ? styles.tabPane : styles.tabPaneHidden}>
-          <NextFeatureScreen userId={session.user.id} active={tab === 'next'} />
         </View>
       </View>
 
