@@ -1,4 +1,10 @@
 {
-  "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "lib": ["ES2022", "DOM"]
+  },
+  "extends": "expo/tsconfig.base",
+  "exclude": ["supabase/functions/**"]
 }
