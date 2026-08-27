@@ -1,3 +1,4 @@
+import './src/globalErrorHandler';
 import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
@@ -57,6 +58,23 @@ function App() {
     });
     return () => subscription.subscription.unsubscribe();
   }, []);
+
+  // Dev helper: auto sign-in with mock credentials so we can reproduce auth/render flows
+  useEffect(() => {
+    if (!__DEV__) return;
+    if (session !== undefined) return; // only attempt when session not yet resolved
+    const t = setTimeout(() => {
+      try {
+        console.log('DEV_AUTO_SIGNIN: attempting mock sign-in');
+        supabase.auth.signInWithPassword({ email: 'dev@local', password: 'password' })
+          .then((res) => console.log('DEV_AUTO_SIGNIN result', res && res.error ? res.error : 'ok'))
+          .catch((e) => console.error('DEV_AUTO_SIGNIN error', e));
+      } catch (e) {
+        console.error('DEV_AUTO_SIGNIN exception', e);
+      }
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [session]);
 
   useEffect(() => {
     if (session === undefined) return;
