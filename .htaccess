@@ -1,0 +1,45 @@
+# Hostinger / LiteSpeed. Use this file when the whole repo is uploaded
+# to public_html. The marketing site lives in website/, so without these
+# rewrites Hostinger serves its default hosting page at / instead of
+# NearMatch.
+#
+# Preferred upload is still: put the *contents* of website/ in public_html
+# (that directory has its own .htaccess). This root file is the fallback
+# for a full-repo upload.
+
+DirectoryIndex website/index.html index.html
+
+RewriteEngine On
+
+# Hostinger's documented HTTPS force.
+# https://www.hostinger.com/tutorials/force-https-using-htaccess/
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteCond %{HTTP_HOST} ^www\.nearmatch\.in$ [NC]
+RewriteRule ^(.*)$ https://nearmatch.in/$1 [L,R=301]
+
+# Leave ACME / SSL verification paths alone.
+RewriteRule ^\.well-known/ - [L]
+
+# Already inside website/
+RewriteRule ^website/ - [L]
+
+# Map /about.html, /styles.css, /assets/... onto website/ first so the
+# marketing hero assets win over the Expo assets/ folder at the repo root.
+RewriteCond %{DOCUMENT_ROOT}/website/$1 -f
+RewriteRule ^(.*)$ /website/$1 [L]
+
+# /about -> website/about.html (same as Cloudflare's html_handling)
+RewriteCond %{DOCUMENT_ROOT}/website/$1.html -f
+RewriteRule ^(.*)$ /website/$1.html [L]
+
+RewriteRule ^$ /website/index.html [L]
+
+# Do not publish the app, reports, or tooling if this repo is the docroot.
+RewriteRule ^(src|supabase|security-reports|functional-reports|assets|\.git)/ - [F,L]
+RewriteRule ^(package(-lock)?\.json|wrangler\.jsonc|netlify\.toml|app\.json|App\.js|eas\.json)$ - [F,L]
+
+ErrorDocument 404 /website/404.html
+
+Options -Indexes

@@ -1,0 +1,32 @@
+# Hostinger / LiteSpeed. This file belongs at the web root: upload the
+# *contents* of website/ into public_html so this becomes public_html/.htaccess.
+# (If the whole repo is in public_html instead, the root .htaccess rewrites
+# into this directory.)
+
+DirectoryIndex index.html
+
+RewriteEngine On
+
+# Hostinger's documented HTTPS force.
+# https://www.hostinger.com/tutorials/force-https-using-htaccess/
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteCond %{HTTP_HOST} ^www\.nearmatch\.in$ [NC]
+RewriteRule ^(.*)$ https://nearmatch.in/$1 [L,R=301]
+
+RewriteRule ^\.well-known/ - [L]
+
+ErrorDocument 404 /404.html
+
+Options -Indexes
+
+# Same 30-day cache as website/_headers for the large hero assets.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  <FilesMatch "\.(mp4|jpe?g|png|webp|gif)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
