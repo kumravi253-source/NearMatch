@@ -21,9 +21,6 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# Cloudflare Wrangler local state
-.wrangler/
-
 # debug
 npm-debug.*
 yarn-debug.*
