@@ -4,9 +4,9 @@
 # static assets from the publish/output directory (website/). It is the
 # single source of truth for cache and security headers. HTTPS and www→apex
 # redirects are already handled at the Cloudflare edge — do not add them here.
-# Apache .htaccess (open PR #14) and wrangler.jsonc (open PR #17) are out of
-# scope for this file. `! X-Powered-By` is Cloudflare _headers syntax and
-# strips the Express fingerprint when this directory is the CF origin.
+# Apache .htaccess (open PR #14) is out of scope. `! X-Powered-By` is
+# Cloudflare _headers syntax and strips the Express fingerprint when this
+# directory is the CF origin. wrangler.jsonc points Workers at this folder.
 
 /assets/*
   Cache-Control: public, max-age=2592000
