@@ -1,10 +1,30 @@
 # Header rules for the static site.
 #
-# This file is read by both Netlify and Cloudflare Pages, which use the same
-# syntax and both look for it in the publish/output directory (website/).
-# Keeping the rules here rather than in netlify.toml means the cache policy
-# survives the move to Cloudflare unchanged, and there is one source of truth
-# while both hosts are live during the cutover.
+# This file is read by Netlify, Cloudflare Pages, and Cloudflare Workers
+# static assets from the publish/output directory (website/). It is the
+# single source of truth for cache and security headers. HTTPS and www→apex
+# redirects are already handled at the Cloudflare edge — do not add them here.
+# Apache .htaccess (open PR #14) and wrangler.jsonc (open PR #17) are out of
+# scope for this file.
 
 /assets/*
   Cache-Control: public, max-age=2592000
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  X-Content-Type-Options: nosniff
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  X-Content-Type-Options: nosniff
+
+/404.html
+  X-Robots-Tag: noindex, nofollow
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; media-src 'self'; connect-src 'self' https://ipwheuikchuoyskrfghi.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://checkout.razorpay.com https://api.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com
+  ! X-Powered-By
