@@ -19,9 +19,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#E8603A"
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,13 +29,17 @@
         "expo-image-picker",
         {
           "photosPermission": "NearMatch needs access to your photos so you can set a profile picture.",
-          "cameraPermission": "NearMatch needs access to your camera so you can take a profile picture or verify your age with a selfie."
+          "cameraPermission": "NearMatch needs access to your camera so you can take a profile picture or verify your age with a selfie.",
+          "microphonePermission": false
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "NearMatch uses your approximate location to show you people nearby. Your exact location is never shared with other users — only a fuzzy distance like \"3-5 km away\"."
+          "locationWhenInUsePermission": "NearMatch uses your approximate location to show you people nearby. Your exact location is never shared with other users — only a fuzzy distance like \"3-5 km away\".",
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "motionUsagePermission": false
         }
       ],
       "expo-font",
