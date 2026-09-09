@@ -42,5 +42,8 @@ yarn-error.*
 /android
 .netlify/
 
+# Cloudflare Wrangler local state
+.wrangler/
+
 # local Claude Code permissions (may accumulate secrets from approved commands)
 .claude/settings.local.json

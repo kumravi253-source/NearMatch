@@ -1,0 +1,15 @@
+{
+  // "name" must match the Worker in the Cloudflare dashboard, or Workers
+  // Builds rejects the commit before it starts (zero-second red check).
+  "name": "nearmatch",
+  "compatibility_date": "2026-09-08",
+  "assets": {
+    // Serves the static marketing site. website/_headers is read from this
+    // directory, so robots/sitemap Content-Type and security headers apply.
+    "directory": "./website/",
+    // Serve website/404.html with a real 404. Do NOT use
+    // "single-page-application" — that is the SPA catch-all that indexes junk.
+    "not_found_handling": "404-page"
+  }
+  // No "main": unmatched paths stay 404 instead of falling through to code.
+}
