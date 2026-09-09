@@ -4,9 +4,11 @@
 # static assets from the publish/output directory (website/). It is the
 # single source of truth for cache and security headers. HTTPS and www→apex
 # redirects are already handled at the Cloudflare edge — do not add them here.
-# Apache .htaccess (open PR #14) is out of scope. `! X-Powered-By` is
-# Cloudflare _headers syntax and strips the Express fingerprint when this
-# directory is the CF origin. wrangler.jsonc points Workers at this folder.
+# Apache .htaccess (open PR #14) is out of scope. Live apex traffic is
+# Cloudflare → Manus → Express; those responses never read this file.
+# workers/security-headers.js is what strips X-Powered-By and sets CSP /
+# frame / referrer / permissions on nearmatch.in. This file still applies
+# to Workers static-asset responses (previews, robots, sitemap).
 
 /assets/*
   Cache-Control: public, max-age=2592000
