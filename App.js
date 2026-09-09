@@ -16,13 +16,7 @@ import MatchesScreen from './src/screens/matches/MatchesScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import VerifyAgeScreen from './src/screens/verify/VerifyAgeScreen';
 import LikesScreen from './src/screens/likes/LikesScreen';
-import { vexo } from 'vexo-analytics';
-
-// Initialize Vexo at module scope, before any component mounts. Guarded to
-// production so development sessions don't pollute analytics.
-if (__DEV__ === false) {
-  vexo('8facfbf4-0055-4782-9e17-c3c9728a6025');
-}
+import { runStartupTask, startOptionalAnalytics } from './src/lib/startup';
 
 const TABS = [
   { key: 'swipe', label: 'Discover', icon: '🔥' },
@@ -33,7 +27,7 @@ const TABS = [
 
 function App() {
   const { markInteractive } = useObserve();
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Pacifico_400Regular,
     Quicksand_400Regular,
     Quicksand_500Medium,
@@ -49,13 +43,33 @@ function App() {
   const [editingProfile, setEditingProfile] = useState(false);
   const locationRequestedRef = useRef(false);
   const pendingReferralCodeRef = useRef(null);
+  const [startupError, setStartupError] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session ?? null));
+    startOptionalAnalytics(() => require('vexo-analytics').vexo('8facfbf4-0055-4782-9e17-c3c9728a6025'), __DEV__ === false);
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) return;
+    const timer = setTimeout(() => setStartupError(new Error('Font loading timed out')), 15000);
+    return () => clearTimeout(timer);
+  }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    let disposed = false;
+    const cancelSession = runStartupTask(() => supabase.auth.getSession(), {
+      onSuccess: ({ data, error }) => {
+        if (error) { setStartupError(new Error('Session restore failed')); return; }
+        setSession(data.session ?? null);
+      },
+      onError: () => setStartupError(new Error('Session restore failed')),
+    });
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (disposed) return;
+      cancelSession();
       setSession(newSession);
     });
-    return () => subscription.subscription.unsubscribe();
+    return () => { disposed = true; cancelSession(); subscription.subscription.unsubscribe(); };
   }, []);
 
   useEffect(() => {
@@ -67,23 +81,21 @@ function App() {
       setSelectedChatId(null);
       return;
     }
-    let cancelled = false;
     setProfile(undefined);
-    supabase
+    return runStartupTask(() => supabase
       .from('profiles')
       .select('*')
       .eq('id', session.user.id)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (cancelled) return;
+      .maybeSingle(), {
+      onSuccess: ({ data, error }) => {
         if (error) {
-          console.error('Failed to load profile', error);
+          setStartupError(new Error('Profile loading failed'));
+          return;
         }
         setProfile(data ?? null);
-      });
-    return () => {
-      cancelled = true;
-    };
+      },
+      onError: () => setStartupError(new Error('Profile loading failed')),
+    });
   }, [session]);
 
   useEffect(() => {
@@ -154,7 +166,7 @@ function App() {
     // signups, or the main tabs for returning users.
     const stillLoading = !fontsLoaded || session === undefined || (session && profile === undefined);
     if (stillLoading) return;
-    markInteractive();
+    try { markInteractive(); } catch { console.warn('Startup measurement unavailable'); }
   }, [fontsLoaded, session, profile, markInteractive]);
 
   const handleProfileComplete = (savedProfile) => {
@@ -176,6 +188,8 @@ function App() {
     const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
     if (data) setProfile(data);
   };
+
+  if (startupError || fontError) throw new Error('NearMatch startup failed');
 
   if (!fontsLoaded || session === undefined || (session && profile === undefined)) {
     return (
