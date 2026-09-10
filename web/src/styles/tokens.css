@@ -1,0 +1,74 @@
+/* Brand tokens for the web client.
+ *
+ * These are the same values as src/theme/theme.js (mobile) and
+ * website/styles.css (marketing site) — the citrus-pop palette, Pacifico for
+ * the wordmark only, Quicksand for everything else. Three clients, one look.
+ * If the palette moves, it moves in all three; there is no clever sharing
+ * mechanism here because a build step spanning an Expo app, a static site and
+ * a Vite app would cost more than it saves for ~20 values.
+ */
+
+:root {
+  --bg: #FFF8EC;
+  --card: #FFFFFF;
+
+  --coral: #E8603A;
+  --coral-dark: #C44C29;
+  --coral-light: #FDE4D8;
+  --coral-border: #F5C4A8;
+  --input-bg: #FFF1E0;
+
+  --teal: #3D8C7A;
+  --teal-dark: #2E6B5C;
+  --teal-light: #DCF0EA;
+  --teal-border: #A9D7C8;
+
+  --text-primary: #3D2817;
+  --text-secondary: #A8754F;
+  --text-muted: #D9B89C;
+
+  --success: #3DBE6B;
+  --success-light: #E7F7EC;
+  --danger: #C0392B;
+  --white: #FFFFFF;
+
+  /* Pacifico is the wordmark face. The fallbacks matter more than usual here:
+     if the Google Fonts request fails, bare `cursive` resolves to a serif on
+     most Linux and Android systems and the logo stops looking like the brand.
+     Falling back through other script faces, then to the body font, keeps it
+     recognisable rather than wrong. */
+  --font-logo: 'Pacifico', 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', var(--font-body);
+  --font-body: 'Quicksand', ui-rounded, 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(61, 40, 23, 0.06);
+  --shadow-md: 0 8px 24px rgba(61, 40, 23, 0.10);
+  --shadow-lg: 0 20px 50px rgba(61, 40, 23, 0.14);
+
+  /* The mobile app uses 16px radii on every button and card. */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Layout rails. The desktop sidebar replaces the mobile tab bar at
+   * --bp-desktop; between them the app is a single centred column so a
+   * tablet never gets a stretched-out swipe deck. */
+  --sidebar-w: 232px;
+  --tabbar-h: 64px;
+  --content-max: 720px;
+  --deck-max: 420px;
+}
+
+/* The palette is a single warm light theme by design — it matches the app
+ * store screenshots and the marketing site, and a half-built dark variant
+ * would look worse than none. Declared explicitly so a viewer in dark mode
+ * gets the intended page rather than a UA-inverted one. */
+:root { color-scheme: light; }

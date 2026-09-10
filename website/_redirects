@@ -1,0 +1,25 @@
+# Redirect rules for the static site.
+#
+# Cloudflare Pages reads this file from the build output directory, but its
+# source field matches PATHS ONLY. A scheme+hostname source
+# ("https://www.example.com/* ...") is a Netlify feature; Pages ignores such a
+# line silently -- no error, no warning, no redirect.
+#
+# An earlier version of this file carried exactly that rule for www->apex. It
+# read correctly in the repo and would have done nothing in production, with
+# both hostnames serving the site and splitting the canonical URL.
+#
+# So www.nearmatch.in -> nearmatch.in is configured at the ZONE level instead,
+# as a Cloudflare Redirect Rule (dashboard: Rules -> Redirect Rules):
+#
+#     If    hostname equals  www.nearmatch.in
+#     Then  dynamic redirect to
+#           concat("https://nearmatch.in", http.request.uri.path)
+#           status 301, preserve query string
+#
+# Vercel never reads this file; its own redirect lives in website/vercel.json
+# and is unaffected.
+#
+# Path-based rules DO work here and can be added below if the site ever needs
+# them, e.g.:
+#     /old-page  /new-page  301

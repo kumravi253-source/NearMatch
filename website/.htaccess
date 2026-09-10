@@ -1,0 +1,68 @@
+# NearMatch — Apache / LiteSpeed configuration (Hostinger).
+#
+# This file replaces _headers and _redirects, which are Cloudflare/Netlify
+# formats that Apache ignores completely. Those two files are kept in the repo
+# for as long as Vercel/Cloudflare are still connected, but they do nothing
+# here — every rule below is the Hostinger equivalent.
+#
+# Upload the contents of this archive into public_html.
+
+# ---------------------------------------------------------------------------
+# Canonical host and scheme
+# ---------------------------------------------------------------------------
+# Without these, www.nearmatch.in and nearmatch.in both serve the site and
+# split the canonical URL, and http:// stays reachable.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # www -> apex, preserving path and query string.
+  RewriteCond %{HTTP_HOST} ^www\.nearmatch\.in$ [NC]
+  RewriteRule ^(.*)$ https://nearmatch.in/$1 [R=301,L]
+
+  # http -> https. Two conditions because shared hosting often terminates TLS
+  # at a proxy, where %{HTTPS} is off but X-Forwarded-Proto says otherwise.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Caching
+# ---------------------------------------------------------------------------
+# assets/hero-bg.mp4 is ~15 MB. Served uncached it exhausted a 100 GB monthly
+# allowance on a previous host and the site was suspended. This is the Apache
+# equivalent of the /assets/* rule in _headers: 30 days.
+<IfModule mod_headers.c>
+  SetEnvIf Request_URI "^/assets/" NM_LONG_CACHE=1
+  Header set Cache-Control "public, max-age=2592000" env=NM_LONG_CACHE
+
+  # HTML must revalidate, so content edits appear immediately rather than
+  # sitting behind a stale cache.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType video/mp4   "access plus 30 days"
+  ExpiresByType image/jpeg  "access plus 30 days"
+  ExpiresByType image/png   "access plus 30 days"
+  ExpiresByType text/css    "access plus 7 days"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Compression
+# ---------------------------------------------------------------------------
+# Text only. The mp4 and jpg are already compressed; re-compressing wastes CPU.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript application/json image/svg+xml
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Hygiene
+# ---------------------------------------------------------------------------
+Options -Indexes
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
