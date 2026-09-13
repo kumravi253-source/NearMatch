@@ -52,6 +52,7 @@
           "backgroundColor": "#E8603A"
         }
       ],
+      "./plugins/withGoogleMobileAdsKotlinFix.js",
       [
         "expo-tracking-transparency",
         {
