@@ -1,0 +1,17 @@
+{
+  "name": "NearMatch",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "Expo dev server",
+      "command": "npx expo start",
+      "description": "Metro bundler / Expo dev server for the NearMatch app. Press 'w' to open on web (installs react-dom + react-native-web on first use) or scan the QR code with Expo Go. Reads EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY from the environment or a local .env file."
+    }
+  ],
+  "ports": [
+    {
+      "name": "Expo / Metro",
+      "port": 8081
+    }
+  ]
+}
