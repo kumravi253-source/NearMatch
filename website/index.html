@@ -434,6 +434,12 @@
         message.textContent = "You're on the list — we'll email you when NearMatch launches.";
         message.className = 'waitlist-message success';
         emailInput.value = '';
+        if (typeof gtag === 'function') {
+          gtag('event', 'generate_lead', {
+            event_category: 'waitlist',
+            event_label: 'homepage',
+          });
+        }
       } else {
         throw new Error('request failed');
       }
