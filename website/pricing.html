@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pricing — NearMatch</title>
 <meta name="description" content="Simple, transparent pricing. Go Premium for unlimited likes, see who liked you, and priority discovery. Refer friends and earn ₹100 wallet credit each.">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TXCHSJHEZP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TXCHSJHEZP');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -323,6 +330,7 @@
           <li><span class="check">✓</span> Block &amp; report</li>
           <li><span class="cross">✕</span> <span style="color:var(--text-muted)">See who liked you</span></li>
           <li><span class="cross">✕</span> <span style="color:var(--text-muted)">Unlimited likes</span></li>
+          <li><span class="cross">✕</span> <span style="color:var(--text-muted)">Ad-free experience</span></li>
           <li><span class="cross">✕</span> <span style="color:var(--text-muted)">Priority in discovery</span></li>
         </ul>
         <button class="btn-plan btn-plan-outline" onclick="openModal('free')">Get Started Free</button>
@@ -339,6 +347,7 @@
         <ul class="plan-features">
           <li><span class="check">✓</span> Unlimited likes</li>
           <li><span class="check">✓</span> See who liked you</li>
+          <li><span class="check">✓</span> Ad-free experience</li>
           <li><span class="check">✓</span> Priority in discovery feed</li>
           <li><span class="check">✓</span> Real-time chat with matches</li>
           <li><span class="check">✓</span> AI age verification badge</li>
@@ -742,6 +751,12 @@
           message.textContent = "You're on the list — we'll email you when NearMatch launches.";
           message.className = 'waitlist-message success';
           emailInput.value = '';
+          if (typeof gtag === 'function') {
+            gtag('event', 'generate_lead', {
+              event_category: 'waitlist',
+              event_label: 'pricing',
+            });
+          }
         } else {
           throw new Error('request failed');
         }

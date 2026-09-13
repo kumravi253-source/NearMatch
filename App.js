@@ -8,6 +8,8 @@ import { Quicksand_400Regular, Quicksand_500Medium, Quicksand_700Bold } from '@e
 import { supabase } from './src/lib/supabase';
 import { requestAndSaveLocation } from './src/lib/location';
 import { AGE_ATTESTATION_TEXT, DPDP_CONSENT_TEXT } from './src/lib/legal';
+import { getPremiumStatus } from './src/lib/premium';
+import { initializeAds } from './src/lib/ads';
 import { COLORS, FONTS } from './src/theme/theme';
 import AuthScreen from './src/screens/auth/AuthScreen';
 import ProfileSetupScreen from './src/screens/profile/ProfileSetupScreen';
@@ -16,6 +18,7 @@ import MatchesScreen from './src/screens/matches/MatchesScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import VerifyAgeScreen from './src/screens/verify/VerifyAgeScreen';
 import LikesScreen from './src/screens/likes/LikesScreen';
+import AdBanner from './src/components/AdBanner';
 import { vexo } from 'vexo-analytics';
 
 // Initialize Vexo at module scope, before any component mounts. Guarded to
@@ -47,6 +50,7 @@ function App() {
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [showVerifyAge, setShowVerifyAge] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
+  const [isPremium, setIsPremium] = useState(null);
   const locationRequestedRef = useRef(false);
   const pendingReferralCodeRef = useRef(null);
 
@@ -65,6 +69,7 @@ function App() {
       setSplashScreen('splash');
       setTab('swipe');
       setSelectedChatId(null);
+      setIsPremium(null);
       return;
     }
     let cancelled = false;
@@ -147,6 +152,27 @@ function App() {
     locationRequestedRef.current = true;
     requestAndSaveLocation(session.user.id);
   }, [session, profile]);
+
+  useEffect(() => {
+    if (!session || !profile) {
+      setIsPremium(null);
+      return;
+    }
+    let cancelled = false;
+    getPremiumStatus().then((value) => {
+      if (!cancelled) setIsPremium(!!value);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [session, profile]);
+
+  useEffect(() => {
+    // Only initialize AdMob for free users. Premium stays ad-free and
+    // never sees the iOS tracking prompt from this path.
+    if (!session || !profile || isPremium !== false) return;
+    initializeAds();
+  }, [session, profile, isPremium]);
 
   useEffect(() => {
     // Fires once the loading gate below clears, whichever screen the
@@ -262,6 +288,8 @@ function App() {
           />
         </View>
       </View>
+
+      {isPremium === false && !(tab === 'chat' && selectedChatId) ? <AdBanner /> : null}
 
       <View style={styles.tabBar}>
         {TABS.map((t) => (

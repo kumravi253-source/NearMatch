@@ -142,7 +142,7 @@ export default function SwipeScreen({ userId, onSignOut, isAgeVerified, onVerify
 
     Alert.alert(
       isPremium ? 'You are Premium 👑' : 'Free plan',
-      `${isPremium ? "Unlimited likes, priority discovery, and you're visible in Who Liked You." : '10 likes/day. Upgrade for unlimited likes and to see who liked you.'}\n\n${walletLine}\n\nYour referral code: ${referralCode || '—'}\nShare it — friends who sign up with it earn you ₹100 each, with no limit.`,
+          `${isPremium ? "Unlimited likes, no ads, priority discovery, and you're visible in Who Liked You." : '10 likes/day and ads on the free plan. Upgrade for unlimited likes, an ad-free app, and to see who liked you.'}\n\n${walletLine}\n\nYour referral code: ${referralCode || '—'}\nShare it — friends who sign up with it earn you ₹100 each, with no limit.`,
       [
         { text: 'Copy referral code', onPress: () => referralCode && Clipboard.setStringAsync(referralCode) },
         ...(isPremium || Platform.OS === 'ios' ? [] : [{ text: 'Upgrade to Premium', onPress: () => Linking.openURL(PRICING_URL) }]),
